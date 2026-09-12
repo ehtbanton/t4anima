@@ -218,3 +218,7 @@ simply never reaches the person holding the prescription pad. Which is also why
 the fix cannot be another dashboard asking an overloaded GP to care about a
 metric they are not scored on. It has to be something that works the pathway
 itself.
+
+## PGx Watch agent workspace
+
+[PGx Watch](pgx-watch/README.md) adds an Anima ADK evidence agent, independent AI GP review, simulator action execution, and a React dashboard. It includes manual scans, event polling, scheduling, durable SQLite audit history, and the twelve sample pharmacogenetics policies. See its [architecture](pgx-watch/docs/architecture.md) and [validation results](pgx-watch/docs/validation.md).

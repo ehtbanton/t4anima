@@ -1,0 +1,860 @@
+{
+  "type": "object",
+  "properties": {
+    "type": {
+      "type": "string",
+      "enum": [
+        "hospital_note",
+        "save_discharge_summary",
+        "process_document",
+        "messaging_action",
+        "place_pharmacy_order",
+        "update_pharmacy_basket",
+        "remove_pharmacy_basket_line",
+        "checkout_pharmacy_basket",
+        "cancel_pharmacy_order",
+        "receive_pharmacy_order",
+        "receive_pharmacy_referral",
+        "update_pharmacy_referral",
+        "receive_stock",
+        "update_stock_price",
+        "link_prescription_stock",
+        "register_attendance",
+        "update_attendance",
+        "connect_device",
+        "create_task",
+        "create_referral",
+        "order_test",
+        "draft_prescription",
+        "book_appointment",
+        "create_appointment_session",
+        "set_appointment_slot",
+        "arrive_appointment",
+        "cancel_appointment",
+        "save_consultation",
+        "save_problem",
+        "save_allergy",
+        "send_message",
+        "schedule_visit",
+        "dispatch_robot",
+        "review",
+        "accept",
+        "complete",
+        "reject",
+        "dispense",
+        "collect",
+        "share_record",
+        "report_absence",
+        "restore_staff",
+        "allocate_shift"
+      ]
+    },
+    "clientRequestId": {
+      "type": "string",
+      "format": "uuid",
+      "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
+    },
+    "hospitalNoteCommand": {
+      "oneOf": [
+        {
+          "type": "object",
+          "properties": {
+            "kind": {
+              "type": "string",
+              "const": "save"
+            },
+            "template": {
+              "type": "string",
+              "enum": [
+                "free-text",
+                "history-physical",
+                "progress"
+              ]
+            },
+            "sections": {
+              "minItems": 1,
+              "maxItems": 12,
+              "type": "array",
+              "items": {
+                "type": "object",
+                "properties": {
+                  "id": {
+                    "type": "string",
+                    "minLength": 1,
+                    "maxLength": 80
+                  },
+                  "heading": {
+                    "type": "string",
+                    "minLength": 1,
+                    "maxLength": 120
+                  },
+                  "text": {
+                    "type": "string",
+                    "maxLength": 20000
+                  }
+                },
+                "required": [
+                  "id",
+                  "heading",
+                  "text"
+                ]
+              }
+            }
+          },
+          "required": [
+            "kind",
+            "template",
+            "sections"
+          ]
+        },
+        {
+          "type": "object",
+          "properties": {
+            "kind": {
+              "type": "string",
+              "const": "sign"
+            }
+          },
+          "required": [
+            "kind"
+          ]
+        },
+        {
+          "type": "object",
+          "properties": {
+            "kind": {
+              "type": "string",
+              "const": "addendum"
+            },
+            "text": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 20000
+            }
+          },
+          "required": [
+            "kind",
+            "text"
+          ]
+        }
+      ]
+    },
+    "medicationOrder": {
+      "type": "object",
+      "properties": {
+        "drug": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 500
+        },
+        "dose": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 500
+        },
+        "unit": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 500
+        },
+        "route": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 500
+        },
+        "frequency": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 500
+        },
+        "duration": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 500
+        },
+        "quantity": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 100000
+        },
+        "indication": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 2000
+        }
+      },
+      "required": [
+        "drug",
+        "dose",
+        "unit",
+        "route",
+        "frequency",
+        "duration",
+        "quantity",
+        "indication"
+      ]
+    },
+    "bloodTestOrder": {
+      "type": "object",
+      "properties": {
+        "panel": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 500
+        },
+        "panelId": {
+          "type": "string",
+          "enum": [
+            "fbc",
+            "ue",
+            "hba1c",
+            "lft",
+            "crp",
+            "lipids"
+          ]
+        },
+        "specimen": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 500
+        },
+        "priority": {
+          "type": "string",
+          "enum": [
+            "routine",
+            "urgent"
+          ]
+        },
+        "collection": {
+          "type": "string",
+          "enum": [
+            "now",
+            "next-round"
+          ]
+        },
+        "clinicalDetails": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 2000
+        }
+      },
+      "required": [
+        "panel",
+        "specimen",
+        "priority",
+        "collection",
+        "clinicalDetails"
+      ]
+    },
+    "dischargeSections": {
+      "type": "object",
+      "properties": {
+        "reason": {
+          "type": "string",
+          "maxLength": 10000
+        },
+        "course": {
+          "type": "string",
+          "maxLength": 10000
+        },
+        "diagnoses": {
+          "type": "string",
+          "maxLength": 10000
+        },
+        "medicationChanges": {
+          "type": "string",
+          "maxLength": 10000
+        },
+        "results": {
+          "type": "string",
+          "maxLength": 10000
+        },
+        "followUp": {
+          "type": "string",
+          "maxLength": 10000
+        },
+        "gpActions": {
+          "type": "string",
+          "maxLength": 10000
+        }
+      },
+      "required": [
+        "reason",
+        "course",
+        "diagnoses",
+        "medicationChanges",
+        "results",
+        "followUp",
+        "gpActions"
+      ]
+    },
+    "messagingCommand": {
+      "oneOf": [
+        {
+          "type": "object",
+          "properties": {
+            "kind": {
+              "type": "string",
+              "const": "patient_create"
+            },
+            "subject": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 160
+            },
+            "body": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 5000
+            },
+            "channel": {
+              "type": "string",
+              "enum": [
+                "sms",
+                "email"
+              ]
+            }
+          },
+          "required": [
+            "kind",
+            "subject",
+            "body",
+            "channel"
+          ]
+        },
+        {
+          "type": "object",
+          "properties": {
+            "kind": {
+              "type": "string",
+              "const": "reply"
+            },
+            "body": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 5000
+            }
+          },
+          "required": [
+            "kind",
+            "body"
+          ]
+        },
+        {
+          "type": "object",
+          "properties": {
+            "kind": {
+              "type": "string",
+              "const": "create"
+            },
+            "subject": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 160
+            },
+            "body": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 5000
+            },
+            "channel": {
+              "type": "string",
+              "enum": [
+                "sms",
+                "email"
+              ]
+            },
+            "allowReply": {
+              "type": "boolean"
+            }
+          },
+          "required": [
+            "kind",
+            "subject",
+            "body",
+            "channel",
+            "allowReply"
+          ]
+        },
+        {
+          "type": "object",
+          "properties": {
+            "kind": {
+              "type": "string",
+              "const": "send"
+            },
+            "body": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 5000
+            },
+            "channel": {
+              "type": "string",
+              "enum": [
+                "sms",
+                "email"
+              ]
+            }
+          },
+          "required": [
+            "kind",
+            "body",
+            "channel"
+          ]
+        },
+        {
+          "type": "object",
+          "properties": {
+            "kind": {
+              "type": "string",
+              "const": "configure_auto_reply"
+            },
+            "steps": {
+              "maxItems": 20,
+              "type": "array",
+              "items": {
+                "type": "object",
+                "properties": {
+                  "body": {
+                    "type": "string",
+                    "minLength": 1,
+                    "maxLength": 5000
+                  },
+                  "delayMinutes": {
+                    "type": "number",
+                    "minimum": 0,
+                    "maximum": 10080
+                  }
+                },
+                "required": [
+                  "body",
+                  "delayMinutes"
+                ]
+              }
+            }
+          },
+          "required": [
+            "kind",
+            "steps"
+          ]
+        },
+        {
+          "type": "object",
+          "properties": {
+            "kind": {
+              "type": "string",
+              "const": "note"
+            },
+            "body": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 5000
+            }
+          },
+          "required": [
+            "kind",
+            "body"
+          ]
+        },
+        {
+          "type": "object",
+          "properties": {
+            "kind": {
+              "type": "string",
+              "const": "assign"
+            },
+            "assignee": {
+              "type": "string",
+              "maxLength": 120
+            }
+          },
+          "required": [
+            "kind",
+            "assignee"
+          ]
+        },
+        {
+          "type": "object",
+          "properties": {
+            "kind": {
+              "type": "string",
+              "const": "complete"
+            }
+          },
+          "required": [
+            "kind"
+          ]
+        },
+        {
+          "type": "object",
+          "properties": {
+            "kind": {
+              "type": "string",
+              "const": "reopen"
+            }
+          },
+          "required": [
+            "kind"
+          ]
+        },
+        {
+          "type": "object",
+          "properties": {
+            "kind": {
+              "type": "string",
+              "const": "delivery"
+            },
+            "entryId": {
+              "type": "string"
+            },
+            "status": {
+              "type": "string",
+              "enum": [
+                "delivered",
+                "failed"
+              ]
+            }
+          },
+          "required": [
+            "kind",
+            "entryId",
+            "status"
+          ]
+        },
+        {
+          "type": "object",
+          "properties": {
+            "kind": {
+              "type": "string",
+              "const": "retry"
+            },
+            "entryId": {
+              "type": "string"
+            }
+          },
+          "required": [
+            "kind",
+            "entryId"
+          ]
+        },
+        {
+          "type": "object",
+          "properties": {
+            "kind": {
+              "type": "string",
+              "const": "save_template"
+            },
+            "title": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 120
+            },
+            "body": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 5000
+            },
+            "channel": {
+              "type": "string",
+              "enum": [
+                "sms",
+                "email"
+              ]
+            }
+          },
+          "required": [
+            "kind",
+            "title",
+            "body",
+            "channel"
+          ]
+        },
+        {
+          "type": "object",
+          "properties": {
+            "kind": {
+              "type": "string",
+              "const": "archive_template"
+            }
+          },
+          "required": [
+            "kind"
+          ]
+        }
+      ]
+    },
+    "documentTags": {
+      "maxItems": 20,
+      "type": "array",
+      "items": {
+        "type": "string",
+        "minLength": 1,
+        "maxLength": 50
+      }
+    },
+    "documentSnomedCodes": {
+      "maxItems": 20,
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "code": {
+            "type": "string",
+            "pattern": "^[0-9]{6,18}$"
+          },
+          "display": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 200
+          }
+        },
+        "required": [
+          "code",
+          "display"
+        ]
+      }
+    },
+    "documentCommand": {
+      "type": "string",
+      "enum": [
+        "send",
+        "assign",
+        "review",
+        "file",
+        "annotate"
+      ]
+    },
+    "patientId": {
+      "type": "string"
+    },
+    "resourceId": {
+      "type": "string"
+    },
+    "title": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 500
+    },
+    "target": {
+      "type": "string",
+      "enum": [
+        "control",
+        "gp",
+        "hospital",
+        "community",
+        "pharmacy",
+        "diagnostics",
+        "referrals",
+        "wearables",
+        "legacy"
+      ]
+    },
+    "expectedVersion": {
+      "type": "integer",
+      "exclusiveMinimum": 0,
+      "maximum": 9007199254740991
+    },
+    "text": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 20000
+    },
+    "consultationStatus": {
+      "type": "string",
+      "enum": [
+        "draft",
+        "saved"
+      ]
+    },
+    "allergyStatus": {
+      "type": "string",
+      "enum": [
+        "active",
+        "inactive"
+      ]
+    },
+    "reaction": {
+      "type": "string",
+      "maxLength": 2000
+    },
+    "sourceAllergyKey": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 600
+    },
+    "problemStatus": {
+      "type": "string",
+      "enum": [
+        "active",
+        "resolved"
+      ]
+    },
+    "problemCode": {
+      "type": "string",
+      "maxLength": 100
+    },
+    "onsetDate": {
+      "type": "string",
+      "format": "date",
+      "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))$"
+    },
+    "sourceProblemKey": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 600
+    },
+    "startsAt": {
+      "type": "integer",
+      "minimum": 0,
+      "maximum": 8640000000000000
+    },
+    "endsAt": {
+      "type": "integer",
+      "minimum": 0,
+      "maximum": 8640000000000000
+    },
+    "slotMinutes": {
+      "type": "integer",
+      "minimum": 5,
+      "maximum": 120
+    },
+    "sessionId": {
+      "type": "string",
+      "minLength": 1
+    },
+    "sessionVersion": {
+      "type": "integer",
+      "exclusiveMinimum": 0,
+      "maximum": 9007199254740991
+    },
+    "slotCommand": {
+      "type": "string",
+      "enum": [
+        "block",
+        "unblock"
+      ]
+    },
+    "durationMinutes": {
+      "type": "integer",
+      "minimum": 5,
+      "maximum": 120
+    },
+    "productId": {
+      "type": "string",
+      "minLength": 1
+    },
+    "quoteId": {
+      "type": "string",
+      "minLength": 1
+    },
+    "quoteVersion": {
+      "type": "integer",
+      "exclusiveMinimum": 0,
+      "maximum": 9007199254740991
+    },
+    "requiredUnits": {
+      "type": "integer",
+      "minimum": 1,
+      "maximum": 100000
+    },
+    "quantity": {
+      "type": "integer",
+      "minimum": 1,
+      "maximum": 100000
+    },
+    "costPence": {
+      "type": "integer",
+      "minimum": 0,
+      "maximum": 10000000
+    },
+    "pricePence": {
+      "type": "integer",
+      "minimum": 0,
+      "maximum": 10000000
+    },
+    "reorderLevel": {
+      "type": "integer",
+      "minimum": 0,
+      "maximum": 100000
+    },
+    "pharmacyPathway": {
+      "type": "string",
+      "enum": [
+        "Sinusitis",
+        "Sore throat",
+        "Acute otitis media",
+        "Infected insect bites",
+        "Impetigo",
+        "Shingles",
+        "Uncomplicated UTI",
+        "Minor illness",
+        "Urgent medicine supply"
+      ]
+    },
+    "referralSource": {
+      "type": "string",
+      "enum": [
+        "gp",
+        "hospital",
+        "patient",
+        "referrals"
+      ]
+    },
+    "pharmacyCommand": {
+      "type": "string",
+      "enum": [
+        "accept",
+        "consult",
+        "complete"
+      ]
+    },
+    "hospitalCommand": {
+      "type": "string",
+      "enum": [
+        "assign",
+        "assess",
+        "refer",
+        "admit",
+        "discharge"
+      ]
+    },
+    "acuity": {
+      "type": "string",
+      "enum": [
+        "1",
+        "2",
+        "3",
+        "4",
+        "5"
+      ]
+    },
+    "location": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 100
+    },
+    "disposition": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 500
+    },
+    "clinician": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 100
+    },
+    "mode": {
+      "type": "string",
+      "enum": [
+        "in-person",
+        "telephone",
+        "video",
+        "online"
+      ]
+    }
+  },
+  "required": [
+    "type"
+  ],
+  "description": "Executable request fields from the runtime Zod contract. Conditional requirements and clinical workflow transitions are also checked by the engine. Use the named examples as a starting point, choose a permitted site, and copy current resource IDs/versions from a workspace response. All drug prices are integer pence. No clinical advice is provided."
+}

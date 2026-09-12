@@ -1,0 +1,55 @@
+{
+  "type": "object",
+  "properties": {
+    "death": {
+      "$ref": "#/components/schemas/PatientDeath"
+    },
+    "id": {
+      "type": "string"
+    },
+    "name": {
+      "type": "string"
+    },
+    "birthDate": {
+      "type": "string",
+      "format": "date"
+    },
+    "localIds": {
+      "type": "object",
+      "additionalProperties": {
+        "type": "string"
+      }
+    },
+    "conditions": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "needs": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "goals": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "synthetic": {
+      "const": true
+    }
+  },
+  "required": [
+    "id",
+    "name",
+    "birthDate",
+    "localIds",
+    "conditions",
+    "needs",
+    "goals",
+    "synthetic"
+  ]
+}

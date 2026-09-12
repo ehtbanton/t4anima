@@ -1,0 +1,41 @@
+{
+  "type": "object",
+  "properties": {
+    "id": {
+      "type": "string"
+    },
+    "time": {
+      "type": "number",
+      "description": "Simulation Unix timestamp in milliseconds."
+    },
+    "type": {
+      "type": "string"
+    },
+    "actor": {
+      "type": "string"
+    },
+    "resourceId": {
+      "type": "string"
+    },
+    "patientId": {
+      "type": "string"
+    },
+    "detail": {
+      "type": "string"
+    },
+    "visibleTo": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    }
+  },
+  "required": [
+    "id",
+    "time",
+    "type",
+    "actor",
+    "detail",
+    "visibleTo"
+  ]
+}

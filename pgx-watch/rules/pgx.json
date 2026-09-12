@@ -1,0 +1,185 @@
+[
+  {
+    "id": "cyp-poor-stroke",
+    "gene": "CYP2C19",
+    "result": "*2/*2",
+    "drug": "clopidogrel",
+    "context": "stroke/TIA",
+    "code": "RECOMMEND_ALTERNATIVE",
+    "action": "Flag reduced effectiveness. Recommend avoiding clopidogrel where possible and route alternative selection to the stroke prescriber. Prasugrel is contraindicated after stroke/TIA. Include any documented aspirin sensitivity.",
+    "specialist": "Stroke prescriber",
+    "severity": "high",
+    "source": "https://pmc.ncbi.nlm.nih.gov/articles/PMC9287492/",
+    "samplePatients": [
+      "SIM-000011",
+      "SIM-000022",
+      "SIM-000041",
+      "SIM-000051"
+    ]
+  },
+  {
+    "id": "cyp-intermediate",
+    "gene": "CYP2C19",
+    "result": "*1/*2",
+    "drug": "clopidogrel",
+    "context": "TIA",
+    "code": "CONSIDER_ALTERNATIVE",
+    "action": "Flag reduced activation; request review of an alternative antiplatelet appropriate to the indication and contraindications. Prasugrel is contraindicated after stroke/TIA.",
+    "specialist": "Stroke prescriber",
+    "severity": "moderate",
+    "source": "https://pmc.ncbi.nlm.nih.gov/articles/PMC9287492/",
+    "samplePatients": [
+      "SIM-000012"
+    ]
+  },
+  {
+    "id": "cyp-variant",
+    "gene": "CYP2C19",
+    "result": "rs4244285 homozygous variant",
+    "drug": "clopidogrel",
+    "context": "TIA",
+    "code": "VERIFY_RESULT_AND_REVIEW",
+    "action": "Retrieve the referenced laboratory report and confirm variant-to-phenotype interpretation. Flag the letter\u2019s documented impaired clopidogrel activation for prescribing review; preserve the reported variant without inventing a complete diplotype.",
+    "specialist": "Stroke prescriber / genomics laboratory",
+    "severity": "moderate",
+    "source": "",
+    "samplePatients": [
+      "SIM-000013"
+    ]
+  },
+  {
+    "id": "cyp-poor-pci",
+    "gene": "CYP2C19",
+    "result": "*2/*3",
+    "drug": "clopidogrel",
+    "context": "ACS/PCI",
+    "code": "RECOMMEND_ALTERNATIVE",
+    "action": "Route to cardiology for replacement with an appropriate alternative, such as ticagrelor or prasugrel if eligible. Preserve the required antiplatelet coverage during any change.",
+    "specialist": "Cardiology",
+    "severity": "high",
+    "source": "https://pmc.ncbi.nlm.nih.gov/articles/PMC9287492/",
+    "samplePatients": [
+      "SIM-000021"
+    ]
+  },
+  {
+    "id": "dpyd-partial",
+    "gene": "DPYD",
+    "result": "c.2846A>T heterozygous",
+    "drug": "capecitabine / systemic fluorouracil",
+    "context": "fluoropyrimidine treatment",
+    "code": "SPECIALIST_DOSE_REVIEW",
+    "action": "Confirm the complete result and activity score. For a confirmed intermediate metaboliser, recommend 50% of the standard starting dose, followed by specialist titration using toxicity and, where available, drug monitoring. This is not an instruction to halve an established dose automatically.",
+    "specialist": "Oncology",
+    "severity": "high",
+    "source": "https://www.ncbi.nlm.nih.gov/books/NBK385155/",
+    "samplePatients": [
+      "SIM-000014"
+    ]
+  },
+  {
+    "id": "hla-positive",
+    "gene": "HLA-B*57:01",
+    "result": "positive",
+    "drug": "abacavir",
+    "context": "current or planned regimen",
+    "code": "AVOID_DRUG",
+    "action": "Flag abacavir avoidance and route to the HIV specialist for an alternative regimen. Retain a persistent PGx prescribing alert.",
+    "specialist": "HIV specialist",
+    "severity": "high",
+    "source": "https://pmc.ncbi.nlm.nih.gov/articles/PMC3994233/",
+    "samplePatients": [
+      "SIM-000015"
+    ]
+  },
+  {
+    "id": "tpmt-poor",
+    "gene": "TPMT",
+    "result": "*3A/*3C",
+    "drug": "azathioprine",
+    "context": "Crohn\u2019s disease",
+    "code": "AVOID_STANDARD_DOSE_AND_ESCALATE",
+    "action": "Flag severe myelosuppression risk. Request urgent gastroenterology review if currently prescribed; recommend consideration of a non-thiopurine alternative.",
+    "specialist": "Gastroenterology",
+    "severity": "high",
+    "source": "https://files.cpicpgx.org/data/guideline/publication/thiopurines/2026/41618934.pdf",
+    "samplePatients": [
+      "SIM-000016"
+    ]
+  },
+  {
+    "id": "cyp-normal",
+    "gene": "CYP2C19",
+    "result": "*1/*1",
+    "drug": "clopidogrel",
+    "context": "any",
+    "code": "NO_PGX_CHANGE",
+    "action": "Record the result. No genotype-driven adjustment; standard dosing is supported when otherwise appropriate.",
+    "specialist": "GP",
+    "severity": "info",
+    "source": "https://pmc.ncbi.nlm.nih.gov/articles/PMC9287492/",
+    "samplePatients": [
+      "SIM-000017"
+    ]
+  },
+  {
+    "id": "hla-negative",
+    "gene": "HLA-B*57:01",
+    "result": "negative",
+    "drug": "abacavir",
+    "context": "any",
+    "code": "NO_PGX_RESTRICTION",
+    "action": "Record the negative screen. No restriction from this allele; retain routine hypersensitivity counselling and monitoring.",
+    "specialist": "GP",
+    "severity": "info",
+    "source": "https://pmc.ncbi.nlm.nih.gov/articles/PMC3994233/",
+    "samplePatients": [
+      "SIM-000020"
+    ]
+  },
+  {
+    "id": "cyp-pending",
+    "gene": "CYP2C19",
+    "result": "pending",
+    "drug": "clopidogrel",
+    "context": "any",
+    "code": "CHASE_RESULT",
+    "action": "Track the outstanding test and re-evaluate when returned. Do not assign a phenotype or change treatment from a pending result.",
+    "specialist": "GP / genomics laboratory",
+    "severity": "moderate",
+    "source": "",
+    "samplePatients": [
+      "SIM-000018"
+    ]
+  },
+  {
+    "id": "cyp-family",
+    "gene": "CYP2C19",
+    "result": "family history only",
+    "drug": "clopidogrel",
+    "context": "any",
+    "code": "NO_PATIENT_GENOTYPE",
+    "action": "Record family history separately; ask the clinician to consider testing. Do not assign the relative\u2019s phenotype to this patient.",
+    "specialist": "GP",
+    "severity": "info",
+    "source": "",
+    "samplePatients": [
+      "SIM-000019"
+    ]
+  },
+  {
+    "id": "exclude-test",
+    "gene": "CYP2C19",
+    "result": "WRITE TEST",
+    "drug": "any",
+    "context": "test record",
+    "code": "EXCLUDE_TEST_EVIDENCE",
+    "action": "Exclude from clinical action generation unless explicitly running the synthetic test scenario.",
+    "specialist": "None",
+    "severity": "info",
+    "source": "",
+    "samplePatients": [
+      "SIM-000002"
+    ]
+  }
+]

@@ -1,0 +1,107 @@
+{
+  "type": "object",
+  "properties": {
+    "id": {
+      "type": "string"
+    },
+    "now": {
+      "type": "number",
+      "description": "Simulation Unix timestamp in milliseconds."
+    },
+    "speed": {
+      "type": "number"
+    },
+    "paused": {
+      "type": "boolean"
+    },
+    "population": {
+      "type": "integer"
+    },
+    "counters": {
+      "type": "object",
+      "additionalProperties": {
+        "type": "number"
+      }
+    },
+    "resources": {
+      "type": "array",
+      "items": {
+        "$ref": "#/components/schemas/Resource"
+      }
+    },
+    "resourceTotal": {
+      "type": "integer"
+    },
+    "resourceOffset": {
+      "type": "integer"
+    },
+    "resourceLimit": {
+      "type": "integer"
+    },
+    "staffing": {
+      "type": "object",
+      "properties": {
+        "doctors": {
+          "type": "integer"
+        },
+        "nurses": {
+          "type": "integer"
+        },
+        "staffedSpaces": {
+          "type": "integer"
+        },
+        "waiting": {
+          "type": "integer"
+        }
+      },
+      "required": [
+        "doctors",
+        "nurses",
+        "staffedSpaces",
+        "waiting"
+      ]
+    },
+    "faults": {
+      "type": "object",
+      "additionalProperties": {
+        "type": "boolean"
+      }
+    },
+    "events": {
+      "type": "array",
+      "items": {
+        "$ref": "#/components/schemas/Event"
+      }
+    },
+    "agents": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "enabled": {
+            "type": "boolean"
+          }
+        },
+        "required": [
+          "id",
+          "enabled"
+        ]
+      }
+    }
+  },
+  "required": [
+    "id",
+    "now",
+    "speed",
+    "paused",
+    "population",
+    "resources",
+    "resourceTotal",
+    "resourceOffset",
+    "resourceLimit",
+    "events"
+  ]
+}

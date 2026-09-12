@@ -1,0 +1,93 @@
+{
+  "type": "object",
+  "properties": {
+    "id": {
+      "type": "string"
+    },
+    "patientId": {
+      "type": "string"
+    },
+    "kind": {
+      "type": "string"
+    },
+    "title": {
+      "type": "string"
+    },
+    "status": {
+      "type": "string"
+    },
+    "owner": {
+      "type": "string"
+    },
+    "visibleTo": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "priority": {
+      "enum": [
+        "routine",
+        "urgent"
+      ]
+    },
+    "createdAt": {
+      "type": "number",
+      "description": "Simulation Unix timestamp in milliseconds."
+    },
+    "dueAt": {
+      "type": "number",
+      "description": "Simulation Unix timestamp in milliseconds."
+    },
+    "data": {
+      "type": "object",
+      "additionalProperties": true,
+      "description": "Kind-specific payload. Hospital notes, medication orders and blood-test orders use the named schemas; the full workspace payload is returned without projection."
+    },
+    "version": {
+      "type": "integer",
+      "minimum": 1
+    },
+    "provenance": {
+      "type": "object",
+      "properties": {
+        "created": {
+          "anyOf": [
+            {
+              "$ref": "#/components/schemas/RecordChange"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "changes": {
+          "type": "array",
+          "items": {
+            "$ref": "#/components/schemas/RecordChange"
+          }
+        },
+        "recovery": {
+          "type": "object",
+          "additionalProperties": true
+        }
+      },
+      "required": [
+        "created",
+        "changes"
+      ]
+    }
+  },
+  "required": [
+    "id",
+    "kind",
+    "title",
+    "status",
+    "owner",
+    "visibleTo",
+    "priority",
+    "createdAt",
+    "data",
+    "version"
+  ]
+}
