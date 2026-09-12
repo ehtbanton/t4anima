@@ -116,7 +116,9 @@ function int16ToFloat32(buf) {
 }
 
 // ── VAPI websocket call ─────────────────────────────────────────────────
-const API_SERVER = "http://localhost:8000";
+// 127.0.0.1 (not localhost): dns.lookup rides the libuv threadpool, which the
+// WhatsApp WASM engine saturates mid-call — numeric IP skips DNS entirely.
+const API_SERVER = "http://127.0.0.1:8000";
 
 async function createVapiWebsocketCall(patient, patientId) {
     const greeting = patientId
@@ -169,19 +171,24 @@ async function executeToolCall(callState, tc) {
     console.log(`🔧 ${callState.id}: tool ${name}(${JSON.stringify(args)})`);
 
     let result = JSON.stringify({ error: "tool execution failed" });
-    try {
-        const r = await fetch(`${API_SERVER}/api/vapi/tool`, {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({
-                message: { type: "function-call", functionCall: { name, parameters: args } },
-                call: { id: callState.vapiCallId },
-                patientId: callState.patientId,
-            }),
-        });
-        result = (await r.json()).result ?? result;
-    } catch (e) {
-        console.error(`🔧 ${callState.id}: webhook error:`, e.message);
+    for (let attempt = 1; attempt <= 3; attempt++) {
+        try {
+            const r = await fetch(`${API_SERVER}/api/vapi/tool`, {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                signal: AbortSignal.timeout(5000),
+                body: JSON.stringify({
+                    message: { type: "function-call", functionCall: { name, parameters: args } },
+                    call: { id: callState.vapiCallId },
+                    patientId: callState.patientId,
+                }),
+            });
+            result = (await r.json()).result ?? result;
+            break;
+        } catch (e) {
+            console.error(`🔧 ${callState.id}: webhook attempt ${attempt} failed:`, e.cause?.code || e.message);
+            if (attempt < 3) await new Promise(res => setTimeout(res, 300));
+        }
     }
 
     callState.messages.push({ role: "tool", content: `${name} → ${String(result).slice(0, 200)}` });
