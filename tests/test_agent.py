@@ -212,13 +212,13 @@ class TestAuthorisation(unittest.TestCase):
         self.assertEqual(sum(1 for a in self.sim.actions if a["type"] == "draft_prescription"),
                          before)
 
-    def test_switch_already_on_record_is_superseded(self):
+    def test_existing_component_requires_reconciliation(self):
         self.sim.store["gp"].append({
             "id": "r-777", "kind": "prescription", "patientId": "SIM-000001", "version": 1,
             "status": "draft", "title": "Aspirin 75mg gastro-resistant tablets",
             "data": {"medicationOrder": {"drug": "Aspirin 75mg gastro-resistant tablets"}}})
         res = self.agent.authorise(self.prop.task_id, clinician="Dr A")
-        self.assertEqual(res["status"], "superseded")
+        self.assertEqual(res["status"], "needs_review")
         self.assertEqual([a for a in self.sim.actions if a["type"] == "draft_prescription"], [])
 
     def test_patient_is_told(self):

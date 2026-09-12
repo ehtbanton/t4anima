@@ -147,7 +147,18 @@ class PatternExtractor:
             if not gdef:
                 continue
             for m in rx.finditer(text):
-                span = _window(text, m.start(), m.end())
+                # Bound the context by neighbouring gene mentions so one gene
+                # cannot inherit a different gene's first diplotype.
+                mentions = sorted((hit.start(), hit.end())
+                                  for other_name, other in self._compiled.items() if other_name != gene
+                                  for hit in other.finditer(text))
+                left = max([0] + [end for start, end in mentions if end <= m.start()])
+                right = min([len(text)] + [start for start, end in mentions if start >= m.end()])
+                span = text[max(left, m.start() - 140):min(right, m.end() + 140)].replace("\n", " ").strip()
+                # With preceding genes, start at this gene rather than carrying
+                # the previous gene's allele into this context.
+                if left:
+                    span = text[m.start():min(right, m.end() + 140)].replace("\n", " ").strip()
                 # Attribution and tense guards run before any call is made.
                 if _is_third_party(span) or _is_pending(span):
                     continue
@@ -188,6 +199,9 @@ class PatternExtractor:
                         break
             if not allele or allele not in gdef.get("carrier_alleles", []):
                 return None
+            if not _is_negated(span) and not re.search(
+                    r"\b(positive|detected|present|carrier|carries|heterozygous|homozygous)\b", span, re.I):
+                return None
             return PgxFinding(
                 gene=gene, evidence=span, source=source, patient_id=patient_id,
                 carrier_allele=allele, negated=_is_negated(span),
@@ -198,6 +212,8 @@ class PatternExtractor:
         alleles: list[str] = []
         dm = DIPLOTYPE_RE.search(span)
         if dm:
+            if re.search(r"\b(not detected|not carried|no variants?|negative)\b", span, re.I):
+                return None
             alleles = [f"*{dm.group(1).strip()}", f"*{dm.group(2).strip()}"]
         else:
             # variant-level reporting: rsIDs or HGVS, map through aliases

@@ -69,7 +69,15 @@ def check_regimen(regimen_id: str, alternative: dict[str, Any],
     caut = REGIMEN_CAUTIONS.get(regimen_id, {})
     allergies = _norm(record.get("allergies", []), "term", "title", "substance")
     problems = _norm(record.get("problems", []), "term", "title")
-    meds = _norm(record.get("medications", []), "term", "drug", "title")
+    current = [m for m in record.get("medications", [])
+               if not isinstance(m, dict) or m.get("isCurrent", True)]
+    meds = _norm(current, "term", "drug", "title")
+    for script in record.get("prescriptions", []):
+        if script.get("status") in ("cancelled", "rejected"):
+            continue
+        data = script.get("data") or {}
+        order = data.get("medicationOrder") or {}
+        meds.append(str(order.get("drug") or data.get("drug") or script.get("title") or "").lower())
     checks: list[SafetyCheck] = []
 
     # 1. Allergy to any component of the proposed regimen.

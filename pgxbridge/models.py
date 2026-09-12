@@ -96,7 +96,7 @@ class Proposal:
     proposed_regimen: dict[str, Any] | None = None
     safety: list[SafetyCheck] = field(default_factory=list)
     blocked_by: list[str] = field(default_factory=list)
-    status: str = "drafted"            # drafted | routed | authorised | rejected | applied | escalated
+    status: str = "drafted"            # also routed, rejected, applied, escalated, incomplete, needs_review
     task_id: str | None = None
     routed_at: int | None = None
     authorised_by: str | None = None

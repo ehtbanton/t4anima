@@ -54,9 +54,54 @@ gene-agnostic from the first commit.
 | `pgxbridge/registry/rules/*.json` | One versioned rule set per drug–gene pair. |
 | `pgxbridge/sim.py` | The only file that knows what record system it is talking to. |
 | `demo/` | Seeds a 12-patient scenario and runs the pipeline end to end. |
-| `tests/` | 47 offline tests. No network, no API key. |
+| `demo/interactive.py` | Local browser demo with an isolated synthetic estate per browser session. |
+| `demo/web/` | Interactive worklist, source viewer, decision dialogs and record view. |
+| `tests/` | Offline pipeline, safety-regression and interactive-session tests. No network, no API key. |
 
 ## Run it
+
+### Interactive browser demo
+
+Requires Python 3.11+ and `requests` (the existing adapter imports it; the browser
+demo makes no external requests).
+
+```bash
+python3 -m pip install -r requirements.txt
+python3 -m demo.interactive
+```
+
+Open **http://127.0.0.1:8765**. Use `--port 8766` if that port is occupied.
+No API key is required. The server binds to loopback only. Each browser session
+gets its own in-memory estate; resetting restores the original cohort. State is
+discarded when the server stops or the session expires after two idle hours.
+
+Suggested three-minute walkthrough:
+
+1. Read Mei Khan's discharge letter, then **Screen 12 patient records**.
+2. Inspect her proposed regimen and checks. **Approve demo change**, enter a
+   reviewer name, and confirm. The record shows the original cancelled, two
+   replacement **drafts**, and a message **preview**. Nothing is issued or sent.
+3. Select Ravi Shah to see why DPYD dose reduction is a specialist decision.
+   **Request specialist review** and record a reason; medicines stay unchanged.
+4. Select James Patel to see the allergy block. Use **Controls** to inspect the
+   normal, pending, family-history, and negative-result cases that stay silent.
+5. **Advance 48 hours**, then **Check chase again**: pending alerts get reminders;
+   completed decisions are excluded and the cooldown prevents duplicates.
+6. Reset and open **Try a safety scenario** on Mei's decision to add an allergy
+   after drafting, or fail the next prescription write. Failed writes preserve
+   the original medicine and do not generate a success message.
+
+The interface runs the actual pattern extractor, phenotype normaliser, rule
+engine, safety checks and authorisation path against a local adapter. All source
+letters, genotypes, names and prescriptions are intentionally synthetic. It does
+not discover genotypes in the original NHS-SIM dataset or connect to NHS-SIM.
+Reviewer names record a demo decision; they are not authenticated identities.
+
+### Scripted NHS-SIM walkthrough
+
+This older CLI walkthrough automatically approves its first offered proposal
+with a hard-coded synthetic clinician name and advances the shared simulator
+clock. It is not the interactive browser demo.
 
 ```bash
 export NHS_SIM_KEY=sim_...
@@ -98,10 +143,14 @@ sentences ("her mother is a poor metaboliser"), refuses pending tests ("sample
 sent, result awaited"), and handles the fact that "not detected" contains
 "detected". Those cases are negative controls in the demo cohort and tests.
 
-**The record is the source of truth, not the agent's ledger.** If the phenotype
-is already coded, the agent adopts it rather than writing a duplicate. If the
-replacement regimen is already on the record, authorisation returns
-`superseded` and prescribes nothing. Two agents racing produce one outcome.
+**Reconcile with the current record.** If the phenotype is already coded, the
+agent adopts it during coding rather than writing a duplicate. If any replacement
+component is already on the record, authorisation returns `needs_review` and
+creates no additional drafts. Safety and the original prescription version are
+rechecked before authorisation. Failed or partial writes return `incomplete`;
+they cannot be retried blindly. This is not a cross-process transaction system.
+The prescribing hook still reads the local phenotype ledger; record-based
+rehydration and durable multi-instance coordination remain deployment work.
 
 **Alert fatigue is a safety failure.** Routing is idempotent — a finding already
 sitting in someone's inbox is not raised again. The chase has a cooldown so an
