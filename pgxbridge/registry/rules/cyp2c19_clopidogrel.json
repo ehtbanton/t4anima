@@ -1,0 +1,75 @@
+{
+  "rule_id": "CYP2C19-CLOPIDOGREL",
+  "rule_version": "1.3.0",
+  "effective_from": "2026-04-01",
+  "author": "Medicines Optimisation / Clinical Genomics joint rule set",
+  "gene": "CYP2C19",
+  "drugs": ["clopidogrel"],
+  "indication_scope": ["stroke", "tia", "transient ischaemic attack", "secondary prevention", "acs", "pci"],
+  "source": "CPIC clopidogrel/CYP2C19 guideline; NICE DG54; NICE NG128",
+  "recommendations": {
+    "poor_metaboliser": {
+      "severity": "high",
+      "action": "switch",
+      "summary": "CYP2C19 poor metaboliser: clopidogrel is substantially less effective. Switch to an alternative antiplatelet.",
+      "alternatives": [
+        {
+          "rank": 1,
+          "regimen": "aspirin_dipyridamole",
+          "label": "Aspirin 75mg once daily + dipyridamole MR 200mg twice daily",
+          "components": [
+            { "drug": "Aspirin 75mg gastro-resistant tablets", "dose": "75", "unit": "mg", "route": "oral", "frequency": "once daily", "duration": "28 days", "quantity": 28 },
+            { "drug": "Dipyridamole 200mg modified-release capsules", "dose": "200", "unit": "mg", "route": "oral", "frequency": "twice daily", "duration": "28 days", "quantity": 56 }
+          ],
+          "indication_filter": ["stroke", "tia", "transient ischaemic attack", "secondary prevention"]
+        },
+        {
+          "rank": 2,
+          "regimen": "ticagrelor_aspirin",
+          "label": "Ticagrelor 90mg twice daily + aspirin 75mg once daily",
+          "components": [
+            { "drug": "Ticagrelor 90mg tablets", "dose": "90", "unit": "mg", "route": "oral", "frequency": "twice daily", "duration": "28 days", "quantity": 56 },
+            { "drug": "Aspirin 75mg gastro-resistant tablets", "dose": "75", "unit": "mg", "route": "oral", "frequency": "once daily", "duration": "28 days", "quantity": 28 }
+          ],
+          "indication_filter": ["stroke", "tia", "transient ischaemic attack", "secondary prevention", "acs", "pci"]
+        }
+      ]
+    },
+    "intermediate_metaboliser": {
+      "severity": "high",
+      "action": "switch",
+      "summary": "CYP2C19 intermediate metaboliser: reduced clopidogrel activation and higher recurrent event risk. Switch to an alternative antiplatelet.",
+      "alternatives": [
+        {
+          "rank": 1,
+          "regimen": "aspirin_dipyridamole",
+          "label": "Aspirin 75mg once daily + dipyridamole MR 200mg twice daily",
+          "components": [
+            { "drug": "Aspirin 75mg gastro-resistant tablets", "dose": "75", "unit": "mg", "route": "oral", "frequency": "once daily", "duration": "28 days", "quantity": 28 },
+            { "drug": "Dipyridamole 200mg modified-release capsules", "dose": "200", "unit": "mg", "route": "oral", "frequency": "twice daily", "duration": "28 days", "quantity": 56 }
+          ],
+          "indication_filter": ["stroke", "tia", "transient ischaemic attack", "secondary prevention"]
+        },
+        {
+          "rank": 2,
+          "regimen": "ticagrelor_aspirin",
+          "label": "Ticagrelor 90mg twice daily + aspirin 75mg once daily",
+          "components": [
+            { "drug": "Ticagrelor 90mg tablets", "dose": "90", "unit": "mg", "route": "oral", "frequency": "twice daily", "duration": "28 days", "quantity": 56 },
+            { "drug": "Aspirin 75mg gastro-resistant tablets", "dose": "75", "unit": "mg", "route": "oral", "frequency": "once daily", "duration": "28 days", "quantity": 28 }
+          ],
+          "indication_filter": ["stroke", "tia", "transient ischaemic attack", "secondary prevention", "acs", "pci"]
+        }
+      ]
+    },
+    "likely_intermediate_metaboliser": {
+      "severity": "moderate",
+      "action": "review",
+      "summary": "CYP2C19 likely intermediate metaboliser: consider an alternative antiplatelet; confirm diplotype call with the laboratory.",
+      "alternatives": []
+    },
+    "normal_metaboliser":     { "severity": "none", "action": "no_change", "summary": "CYP2C19 normal metaboliser: clopidogrel at standard dose is appropriate.", "alternatives": [] },
+    "rapid_metaboliser":      { "severity": "none", "action": "no_change", "summary": "CYP2C19 rapid metaboliser: clopidogrel at standard dose is appropriate.", "alternatives": [] },
+    "ultrarapid_metaboliser": { "severity": "none", "action": "no_change", "summary": "CYP2C19 ultrarapid metaboliser: clopidogrel at standard dose is appropriate.", "alternatives": [] }
+  }
+}

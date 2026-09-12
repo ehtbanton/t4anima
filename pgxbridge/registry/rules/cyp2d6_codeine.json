@@ -1,0 +1,34 @@
+{
+  "rule_id": "CYP2D6-CODEINE",
+  "rule_version": "1.0.0",
+  "effective_from": "2026-04-01",
+  "author": "Medicines Optimisation / Clinical Genomics joint rule set",
+  "gene": "CYP2D6",
+  "drugs": ["codeine", "tramadol", "dihydrocodeine"],
+  "indication_scope": [],
+  "source": "CPIC codeine/CYP2D6 guideline; MHRA codeine safety advice",
+  "recommendations": {
+    "ultrarapid_metaboliser": {
+      "severity": "critical",
+      "action": "contraindicated",
+      "summary": "CYP2D6 ultrarapid metaboliser: codeine produces excessive morphine and risks life-threatening respiratory depression. Avoid. Use a non-CYP2D6 analgesic.",
+      "alternatives": [
+        { "rank": 1, "regimen": "paracetamol_nsaid", "label": "Paracetamol +/- NSAID, or morphine if opioid required",
+          "components": [ { "drug": "Paracetamol 500mg tablets", "dose": "1000", "unit": "mg", "route": "oral", "frequency": "four times daily when required", "duration": "14 days", "quantity": 112 } ],
+          "indication_filter": [] }
+      ]
+    },
+    "poor_metaboliser": {
+      "severity": "high",
+      "action": "switch",
+      "summary": "CYP2D6 poor metaboliser: codeine gives little or no analgesia. Use a non-CYP2D6 analgesic.",
+      "alternatives": [
+        { "rank": 1, "regimen": "paracetamol_nsaid", "label": "Paracetamol +/- NSAID, or morphine if opioid required",
+          "components": [ { "drug": "Paracetamol 500mg tablets", "dose": "1000", "unit": "mg", "route": "oral", "frequency": "four times daily when required", "duration": "14 days", "quantity": 112 } ],
+          "indication_filter": [] }
+      ]
+    },
+    "intermediate_metaboliser": { "severity": "moderate", "action": "review", "summary": "CYP2D6 intermediate metaboliser: codeine analgesia may be reduced. Monitor response and consider an alternative if ineffective.", "alternatives": [] },
+    "normal_metaboliser": { "severity": "none", "action": "no_change", "summary": "CYP2D6 normal metaboliser: standard codeine dosing.", "alternatives": [] }
+  }
+}

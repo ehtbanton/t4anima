@@ -1,0 +1,28 @@
+{
+  "rule_id": "TPMT-THIOPURINE",
+  "rule_version": "1.0.0",
+  "effective_from": "2026-04-01",
+  "author": "Medicines Optimisation / Clinical Genomics joint rule set",
+  "gene": "TPMT",
+  "drugs": ["azathioprine", "mercaptopurine", "6-mercaptopurine", "thioguanine"],
+  "indication_scope": [],
+  "source": "CPIC thiopurine/TPMT-NUDT15 guideline; BNF azathioprine monograph",
+  "recommendations": {
+    "poor_metaboliser": {
+      "severity": "critical",
+      "action": "hold",
+      "summary": "TPMT poor metaboliser: standard thiopurine dosing risks life-threatening myelosuppression. Do not issue at standard dose. Specialist review required; if a thiopurine is essential, use drastically reduced dosing with intensive FBC monitoring.",
+      "alternatives": [],
+      "escalate_to": "specialist"
+    },
+    "intermediate_metaboliser": {
+      "severity": "high",
+      "action": "dose_reduce",
+      "summary": "TPMT intermediate metaboliser: start at 30-80% of the standard dose with FBC monitoring.",
+      "dose_modifier": 0.5,
+      "alternatives": [],
+      "escalate_to": "specialist"
+    },
+    "normal_metaboliser": { "severity": "none", "action": "no_change", "summary": "TPMT normal metaboliser: standard thiopurine dosing with routine monitoring.", "alternatives": [] }
+  }
+}

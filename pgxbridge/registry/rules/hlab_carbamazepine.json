@@ -1,0 +1,20 @@
+{
+  "rule_id": "HLAB1502-CARBAMAZEPINE",
+  "rule_version": "1.0.0",
+  "effective_from": "2026-04-01",
+  "author": "Medicines Optimisation / Clinical Genomics joint rule set",
+  "gene": "HLA-B",
+  "drugs": ["carbamazepine", "oxcarbazepine"],
+  "indication_scope": [],
+  "source": "CPIC carbamazepine/HLA-B guideline",
+  "recommendations": {
+    "positive_15_02": {
+      "severity": "critical",
+      "action": "contraindicated",
+      "summary": "HLA-B*15:02 positive: carbamazepine is contraindicated in carbamazepine-naive patients (Stevens-Johnson syndrome / toxic epidermal necrolysis risk). Select a structurally unrelated anticonvulsant.",
+      "alternatives": [],
+      "escalate_to": "neurology"
+    },
+    "negative": { "severity": "none", "action": "no_change", "summary": "HLA-B*15:02 negative: standard carbamazepine prescribing.", "alternatives": [] }
+  }
+}
