@@ -1,0 +1,255 @@
+{
+  "registry_version": "2026.09.1",
+  "codes_validated": false,
+  "codes_note": "SNOMED CT identifiers below are PLACEHOLDERS pending validation against the UK SNOMED CT Clinical Edition + UK Drug Extension. They are structurally valid (6-18 digits) so the pipeline runs end to end, but MUST be replaced with released concept IDs before any non-simulated use. See README 'Before real use'.",
+  "genes": {
+    "CYP2C19": {
+      "display": "Cytochrome P450 2C19",
+      "model": "diplotype",
+      "allele_function": {
+        "*1": "normal",
+        "*38": "normal",
+        "*17": "increased",
+        "*2": "none",
+        "*3": "none",
+        "*4": "none",
+        "*5": "none",
+        "*6": "none",
+        "*7": "none",
+        "*8": "none",
+        "*9": "decreased",
+        "*10": "decreased",
+        "*16": "decreased",
+        "*35": "none"
+      },
+      "variant_aliases": {
+        "rs4244285": "*2",
+        "rs4986893": "*3",
+        "rs12248560": "*17",
+        "681G>A": "*2",
+        "636G>A": "*3",
+        "c.681G>A": "*2",
+        "c.636G>A": "*3"
+      },
+      "phenotypes": {
+        "poor_metaboliser": {
+          "display": "CYP2C19 poor metaboliser",
+          "snomed": { "code": "1145431000000108", "display": "Cytochrome P450 2C19 poor metaboliser" },
+          "rule": { "none": 2 }
+        },
+        "intermediate_metaboliser": {
+          "display": "CYP2C19 intermediate metaboliser",
+          "snomed": { "code": "1145441000000104", "display": "Cytochrome P450 2C19 intermediate metaboliser" },
+          "rule": { "none": 1, "with": ["normal", "decreased"] }
+        },
+        "likely_intermediate_metaboliser": {
+          "display": "CYP2C19 likely intermediate metaboliser",
+          "snomed": { "code": "1145461000000103", "display": "Cytochrome P450 2C19 likely intermediate metaboliser" },
+          "rule": { "none": 1, "with": ["increased"] }
+        },
+        "normal_metaboliser": {
+          "display": "CYP2C19 normal metaboliser",
+          "snomed": { "code": "1145451000000101", "display": "Cytochrome P450 2C19 normal metaboliser" },
+          "rule": { "none": 0, "increased": 0 }
+        },
+        "rapid_metaboliser": {
+          "display": "CYP2C19 rapid metaboliser",
+          "snomed": { "code": "1145471000000105", "display": "Cytochrome P450 2C19 rapid metaboliser" },
+          "rule": { "none": 0, "increased": 1 }
+        },
+        "ultrarapid_metaboliser": {
+          "display": "CYP2C19 ultrarapid metaboliser",
+          "snomed": { "code": "1145481000000107", "display": "Cytochrome P450 2C19 ultrarapid metaboliser" },
+          "rule": { "none": 0, "increased": 2 }
+        }
+      },
+      "phrase_phenotypes": {
+        "poor metaboliser": "poor_metaboliser",
+        "poor metabolizer": "poor_metaboliser",
+        "pm phenotype": "poor_metaboliser",
+        "intermediate metaboliser": "intermediate_metaboliser",
+        "intermediate metabolizer": "intermediate_metaboliser",
+        "normal metaboliser": "normal_metaboliser",
+        "extensive metaboliser": "normal_metaboliser",
+        "rapid metaboliser": "rapid_metaboliser",
+        "ultrarapid metaboliser": "ultrarapid_metaboliser",
+        "ultra-rapid metaboliser": "ultrarapid_metaboliser"
+      },
+      "loss_of_function_phenotypes": ["poor_metaboliser", "intermediate_metaboliser"]
+    },
+
+    "DPYD": {
+      "display": "Dihydropyrimidine dehydrogenase",
+      "model": "activity_score",
+      "allele_function": {
+        "*1": "normal",
+        "*2A": "none",
+        "*13": "none",
+        "c.1905+1G>A": "none",
+        "c.1679T>G": "none",
+        "c.2846A>T": "decreased",
+        "c.1236G>A": "decreased",
+        "HapB3": "decreased"
+      },
+      "variant_aliases": {
+        "rs3918290": "c.1905+1G>A",
+        "rs55886062": "c.1679T>G",
+        "rs67376798": "c.2846A>T",
+        "rs56038477": "c.1236G>A",
+        "*2A": "c.1905+1G>A",
+        "*13": "c.1679T>G"
+      },
+      "activity_values": { "normal": 1.0, "decreased": 0.5, "none": 0.0 },
+      "phenotypes": {
+        "poor_metaboliser": {
+          "display": "DPYD poor metaboliser (DPD deficiency)",
+          "snomed": { "code": "1145491000000109", "display": "Dihydropyrimidine dehydrogenase deficiency" },
+          "activity_range": [0.0, 0.5]
+        },
+        "intermediate_metaboliser": {
+          "display": "DPYD intermediate metaboliser (partial DPD deficiency)",
+          "snomed": { "code": "1145501000000103", "display": "Partial dihydropyrimidine dehydrogenase deficiency" },
+          "activity_range": [1.0, 1.5]
+        },
+        "normal_metaboliser": {
+          "display": "DPYD normal metaboliser",
+          "snomed": { "code": "1145511000000101", "display": "Dihydropyrimidine dehydrogenase normal activity" },
+          "activity_range": [2.0, 2.0]
+        }
+      },
+      "phrase_phenotypes": {
+        "dpd deficiency": "poor_metaboliser",
+        "complete dpd deficiency": "poor_metaboliser",
+        "partial dpd deficiency": "intermediate_metaboliser",
+        "poor metaboliser": "poor_metaboliser",
+        "intermediate metaboliser": "intermediate_metaboliser",
+        "normal metaboliser": "normal_metaboliser",
+        "no variants detected": "normal_metaboliser",
+        "wild type": "normal_metaboliser"
+      },
+      "loss_of_function_phenotypes": ["poor_metaboliser", "intermediate_metaboliser"]
+    },
+
+    "TPMT": {
+      "display": "Thiopurine methyltransferase",
+      "model": "diplotype",
+      "allele_function": {
+        "*1": "normal",
+        "*2": "none",
+        "*3A": "none",
+        "*3B": "none",
+        "*3C": "none",
+        "*4": "none"
+      },
+      "variant_aliases": { "rs1800462": "*2", "rs1800460": "*3B", "rs1142345": "*3C" },
+      "phenotypes": {
+        "poor_metaboliser": {
+          "display": "TPMT poor metaboliser",
+          "snomed": { "code": "1145521000000107", "display": "Thiopurine methyltransferase deficiency" },
+          "rule": { "none": 2 }
+        },
+        "intermediate_metaboliser": {
+          "display": "TPMT intermediate metaboliser",
+          "snomed": { "code": "1145531000000109", "display": "Thiopurine methyltransferase intermediate activity" },
+          "rule": { "none": 1, "with": ["normal"] }
+        },
+        "normal_metaboliser": {
+          "display": "TPMT normal metaboliser",
+          "snomed": { "code": "1145541000000100", "display": "Thiopurine methyltransferase normal activity" },
+          "rule": { "none": 0 }
+        }
+      },
+      "phrase_phenotypes": {
+        "poor metaboliser": "poor_metaboliser",
+        "tpmt deficient": "poor_metaboliser",
+        "absent tpmt activity": "poor_metaboliser",
+        "intermediate metaboliser": "intermediate_metaboliser",
+        "intermediate activity": "intermediate_metaboliser",
+        "normal metaboliser": "normal_metaboliser",
+        "normal activity": "normal_metaboliser"
+      },
+      "loss_of_function_phenotypes": ["poor_metaboliser", "intermediate_metaboliser"]
+    },
+
+    "HLA-B": {
+      "display": "Human leukocyte antigen B",
+      "model": "carrier",
+      "carrier_alleles": ["*57:01", "*15:02", "*58:01"],
+      "variant_aliases": { "rs2395029": "*57:01" },
+      "phenotypes": {
+        "positive_57_01": {
+          "display": "HLA-B*57:01 positive",
+          "snomed": { "code": "1145551000000102", "display": "HLA-B*57:01 allele detected" },
+          "allele": "*57:01"
+        },
+        "positive_15_02": {
+          "display": "HLA-B*15:02 positive",
+          "snomed": { "code": "1145561000000104", "display": "HLA-B*15:02 allele detected" },
+          "allele": "*15:02"
+        },
+        "positive_58_01": {
+          "display": "HLA-B*58:01 positive",
+          "snomed": { "code": "1145571000000106", "display": "HLA-B*58:01 allele detected" },
+          "allele": "*58:01"
+        },
+        "negative": {
+          "display": "HLA-B risk alleles not detected",
+          "snomed": { "code": "1145581000000108", "display": "HLA-B risk allele not detected" },
+          "allele": null
+        }
+      },
+      "phrase_phenotypes": {},
+      "loss_of_function_phenotypes": ["positive_57_01", "positive_15_02", "positive_58_01"]
+    },
+
+    "CYP2D6": {
+      "display": "Cytochrome P450 2D6",
+      "model": "activity_score",
+      "allele_function": {
+        "*1": "normal",
+        "*2": "normal",
+        "*3": "none",
+        "*4": "none",
+        "*5": "none",
+        "*6": "none",
+        "*9": "decreased",
+        "*10": "decreased",
+        "*17": "decreased",
+        "*41": "decreased"
+      },
+      "variant_aliases": { "rs3892097": "*4", "rs5030655": "*6", "rs16947": "*2" },
+      "activity_values": { "normal": 1.0, "decreased": 0.25, "none": 0.0 },
+      "phenotypes": {
+        "poor_metaboliser": {
+          "display": "CYP2D6 poor metaboliser",
+          "snomed": { "code": "1145591000000105", "display": "Cytochrome P450 2D6 poor metaboliser" },
+          "activity_range": [0.0, 0.0]
+        },
+        "intermediate_metaboliser": {
+          "display": "CYP2D6 intermediate metaboliser",
+          "snomed": { "code": "1145601000000104", "display": "Cytochrome P450 2D6 intermediate metaboliser" },
+          "activity_range": [0.25, 1.0]
+        },
+        "normal_metaboliser": {
+          "display": "CYP2D6 normal metaboliser",
+          "snomed": { "code": "1145611000000102", "display": "Cytochrome P450 2D6 normal metaboliser" },
+          "activity_range": [1.25, 2.25]
+        },
+        "ultrarapid_metaboliser": {
+          "display": "CYP2D6 ultrarapid metaboliser",
+          "snomed": { "code": "1145621000000108", "display": "Cytochrome P450 2D6 ultrarapid metaboliser" },
+          "activity_range": [2.5, 100.0]
+        }
+      },
+      "phrase_phenotypes": {
+        "poor metaboliser": "poor_metaboliser",
+        "intermediate metaboliser": "intermediate_metaboliser",
+        "normal metaboliser": "normal_metaboliser",
+        "extensive metaboliser": "normal_metaboliser",
+        "ultrarapid metaboliser": "ultrarapid_metaboliser",
+        "ultra-rapid metaboliser": "ultrarapid_metaboliser"
+      },
+      "loss_of_function_phenotypes": ["poor_metaboliser", "intermediate_metaboliser", "ultrarapid_metaboliser"]
+    }
+  }
+}

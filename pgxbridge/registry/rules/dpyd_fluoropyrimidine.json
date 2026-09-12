@@ -1,0 +1,28 @@
+{
+  "rule_id": "DPYD-FLUOROPYRIMIDINE",
+  "rule_version": "1.1.0",
+  "effective_from": "2026-04-01",
+  "author": "Medicines Optimisation / Clinical Genomics joint rule set",
+  "gene": "DPYD",
+  "drugs": ["capecitabine", "fluorouracil", "5-fu", "tegafur"],
+  "indication_scope": [],
+  "source": "CPIC fluoropyrimidine/DPYD guideline; NHS England DPYD testing mandate (2020)",
+  "recommendations": {
+    "poor_metaboliser": {
+      "severity": "critical",
+      "action": "hold",
+      "summary": "DPYD poor metaboliser (DPD deficiency): fluoropyrimidine is contraindicated at standard dose. Do not issue. Oncology must select an alternative agent or, if no alternative exists, use a strongly reduced dose with therapeutic drug monitoring.",
+      "alternatives": [],
+      "escalate_to": "oncology"
+    },
+    "intermediate_metaboliser": {
+      "severity": "high",
+      "action": "dose_reduce",
+      "summary": "DPYD intermediate metaboliser (partial DPD deficiency): reduce starting dose by 50% and titrate on toxicity and drug-level monitoring.",
+      "dose_modifier": 0.5,
+      "alternatives": [],
+      "escalate_to": "oncology"
+    },
+    "normal_metaboliser": { "severity": "none", "action": "no_change", "summary": "DPYD normal metaboliser: standard fluoropyrimidine dosing.", "alternatives": [] }
+  }
+}

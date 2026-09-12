@@ -1,0 +1,20 @@
+{
+  "rule_id": "HLAB5701-ABACAVIR",
+  "rule_version": "1.0.0",
+  "effective_from": "2026-04-01",
+  "author": "Medicines Optimisation / Clinical Genomics joint rule set",
+  "gene": "HLA-B",
+  "drugs": ["abacavir"],
+  "indication_scope": [],
+  "source": "CPIC abacavir/HLA-B guideline; BHIVA",
+  "recommendations": {
+    "positive_57_01": {
+      "severity": "critical",
+      "action": "contraindicated",
+      "summary": "HLA-B*57:01 positive: abacavir is absolutely contraindicated (hypersensitivity reaction risk). Do not issue under any circumstances.",
+      "alternatives": [],
+      "escalate_to": "hiv_specialist"
+    },
+    "negative": { "severity": "none", "action": "no_change", "summary": "HLA-B*57:01 negative: abacavir may be used with standard counselling.", "alternatives": [] }
+  }
+}
