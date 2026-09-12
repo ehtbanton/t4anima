@@ -2,3 +2,13 @@
 node_modules/
 .env
 *.log
+.venv/
+__pycache__/
+
+# WhatsApp linked-device credentials — never commit
+whatsapp_session/
+
+# Bulk generated data (patients_50k.json is 1.1GB, over GitHub's limit)
+data/
+models/*.npy
+output/

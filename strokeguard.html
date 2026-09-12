@@ -1,0 +1,1418 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>NHS StrokeGuard - AI Patient Outreach</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --nhs-blue: #005eb8;
+            --nhs-dark-blue: #003087;
+            --nhs-light-blue: #41b6e6;
+            --nhs-green: #009639;
+            --nhs-red: #da291c;
+            --nhs-orange: #ed8b00;
+            --nhs-yellow: #fae100;
+            --bg: #f0f4f5;
+            --bg-white: #ffffff;
+            --border: #d8dde0;
+            --text: #212b32;
+            --text-dim: #4c6272;
+        }
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body {
+            font-family: 'Inter', Arial, sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            font-size: 14px;
+        }
+
+        /* NHS Header */
+        .nhs-header {
+            background: var(--nhs-blue);
+            color: white;
+            padding: 12px 24px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .nhs-logo {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+        }
+        .nhs-logo svg { height: 32px; }
+        .nhs-logo h1 {
+            font-size: 20px;
+            font-weight: 700;
+            letter-spacing: -0.5px;
+        }
+        .nhs-stats {
+            display: flex;
+            gap: 32px;
+        }
+        .nhs-stat {
+            text-align: center;
+        }
+        .nhs-stat .value {
+            font-size: 24px;
+            font-weight: 700;
+        }
+        .nhs-stat .label {
+            font-size: 10px;
+            opacity: 0.8;
+            text-transform: uppercase;
+        }
+
+        /* Main Layout */
+        .layout {
+            display: grid;
+            grid-template-columns: 280px 1fr 380px;
+            height: calc(100vh - 56px);
+        }
+
+        /* Left Panel - Patient List */
+        .sidebar {
+            background: var(--bg-white);
+            border-right: 1px solid var(--border);
+            display: flex;
+            flex-direction: column;
+        }
+        .sidebar-header {
+            padding: 16px;
+            border-bottom: 1px solid var(--border);
+            background: var(--nhs-dark-blue);
+            color: white;
+        }
+        .sidebar-header h2 { font-size: 14px; font-weight: 600; }
+        .sidebar-header p { font-size: 11px; opacity: 0.8; margin-top: 2px; }
+        .filter-bar {
+            padding: 12px;
+            border-bottom: 1px solid var(--border);
+            display: flex;
+            gap: 6px;
+        }
+        .filter-btn {
+            flex: 1;
+            padding: 8px;
+            font-size: 11px;
+            font-weight: 600;
+            border: 1px solid var(--border);
+            background: var(--bg-white);
+            cursor: pointer;
+            font-family: inherit;
+            border-radius: 4px;
+        }
+        .filter-btn.active {
+            background: var(--nhs-blue);
+            color: white;
+            border-color: var(--nhs-blue);
+        }
+        .patient-list { flex: 1; overflow-y: auto; }
+        .patient-item {
+            padding: 12px 16px;
+            border-bottom: 1px solid var(--border);
+            cursor: pointer;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .patient-item:hover { background: var(--bg); }
+        .patient-item.selected {
+            background: #e8f4fd;
+            border-left: 4px solid var(--nhs-blue);
+        }
+        .patient-item .info .id { font-weight: 600; font-size: 13px; }
+        .patient-item .info .meta { font-size: 11px; color: var(--text-dim); margin-top: 2px; }
+        .risk-badge {
+            padding: 4px 10px;
+            font-size: 11px;
+            font-weight: 700;
+            border-radius: 4px;
+        }
+        .risk-badge.critical { background: var(--nhs-red); color: white; }
+        .risk-badge.high { background: var(--nhs-orange); color: white; }
+        .risk-badge.medium { background: var(--nhs-yellow); color: #000; }
+        .risk-badge.low { background: var(--nhs-green); color: white; }
+
+        /* Center Panel */
+        .main {
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+        .patient-header {
+            padding: 20px 24px;
+            background: var(--bg-white);
+            border-bottom: 1px solid var(--border);
+        }
+        .patient-header .top-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+        }
+        .patient-header h2 { font-size: 22px; font-weight: 700; }
+        .patient-header .subtitle { font-size: 13px; color: var(--text-dim); margin-top: 4px; }
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(5, 1fr);
+            gap: 12px;
+            margin-top: 16px;
+        }
+        .stat-box {
+            padding: 12px;
+            background: var(--bg);
+            border: 1px solid var(--border);
+            border-radius: 6px;
+            text-align: center;
+        }
+        .stat-box .label {
+            font-size: 10px;
+            text-transform: uppercase;
+            color: var(--text-dim);
+            font-weight: 600;
+        }
+        .stat-box .value {
+            font-size: 18px;
+            font-weight: 700;
+            margin-top: 4px;
+        }
+        .stat-box .value.red { color: var(--nhs-red); }
+        .stat-box .value.orange { color: var(--nhs-orange); }
+        .stat-box .value.green { color: var(--nhs-green); }
+
+        .content-scroll { flex: 1; overflow-y: auto; padding: 20px 24px; }
+        .section { margin-bottom: 24px; }
+        .section h3 {
+            font-size: 13px;
+            font-weight: 700;
+            margin-bottom: 12px;
+            color: var(--nhs-dark-blue);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        .conditions-list { display: flex; flex-wrap: wrap; gap: 8px; }
+        .condition-tag {
+            padding: 6px 12px;
+            background: var(--bg);
+            border: 1px solid var(--border);
+            border-radius: 20px;
+            font-size: 12px;
+        }
+
+        /* Pre-call Briefing */
+        .briefing-panel {
+            background: #fffbeb;
+            border: 2px solid var(--nhs-orange);
+            border-radius: 8px;
+            padding: 16px;
+            margin-bottom: 20px;
+        }
+        .briefing-panel h4 {
+            font-size: 12px;
+            font-weight: 700;
+            color: var(--nhs-orange);
+            margin-bottom: 10px;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+        .briefing-panel ul {
+            font-size: 13px;
+            margin-left: 20px;
+            line-height: 1.6;
+        }
+
+        /* Timeline */
+        .timeline { display: flex; flex-direction: column; gap: 8px; }
+        .event-item {
+            padding: 12px;
+            background: var(--bg-white);
+            border: 1px solid var(--border);
+            border-radius: 6px;
+            cursor: pointer;
+        }
+        .event-item:hover { border-color: var(--nhs-blue); }
+        .event-item .header { display: flex; justify-content: space-between; align-items: flex-start; }
+        .event-item .title { font-weight: 600; font-size: 13px; }
+        .event-item .date { font-size: 11px; color: var(--text-dim); margin-top: 2px; }
+        .type-badge {
+            font-size: 10px;
+            padding: 3px 8px;
+            background: var(--bg);
+            border-radius: 4px;
+            font-weight: 600;
+            text-transform: uppercase;
+        }
+        .event-item .report-content {
+            display: none;
+            margin-top: 10px;
+            font-size: 12px;
+            color: var(--text-dim);
+            border-top: 1px solid var(--border);
+            padding-top: 10px;
+        }
+        .event-item.expanded .report-content { display: block; }
+
+        /* Right Panel - Call */
+        .call-panel {
+            background: var(--bg-white);
+            border-left: 1px solid var(--border);
+            display: flex;
+            flex-direction: column;
+        }
+        .call-header {
+            padding: 16px;
+            background: var(--nhs-dark-blue);
+            color: white;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .call-header h2 { font-size: 14px; font-weight: 600; }
+        .call-timer {
+            font-size: 18px;
+            font-weight: 700;
+            font-family: monospace;
+            display: none;
+        }
+        .call-timer.active { display: block; }
+
+        .call-status {
+            padding: 16px;
+            border-bottom: 1px solid var(--border);
+            text-align: center;
+        }
+        .call-status .state {
+            font-size: 12px;
+            font-weight: 600;
+            text-transform: uppercase;
+            color: var(--text-dim);
+        }
+        .call-status.active .state { color: var(--nhs-green); }
+        .call-status .patient-id {
+            font-size: 18px;
+            font-weight: 700;
+            margin-top: 4px;
+        }
+
+        .call-btn {
+            margin: 16px;
+            padding: 14px;
+            font-size: 14px;
+            font-weight: 600;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-family: inherit;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+        .call-btn.start {
+            background: var(--nhs-green);
+            color: white;
+        }
+        .call-btn.start:disabled {
+            background: var(--border);
+            color: var(--text-dim);
+            cursor: not-allowed;
+        }
+        .call-btn.end {
+            background: var(--nhs-red);
+            color: white;
+        }
+
+        /* Live Action Feed */
+        .action-feed {
+            padding: 12px;
+            background: var(--bg);
+            border-bottom: 1px solid var(--border);
+            max-height: 150px;
+            overflow-y: auto;
+        }
+        .action-feed h4 {
+            font-size: 10px;
+            font-weight: 700;
+            text-transform: uppercase;
+            color: var(--text-dim);
+            margin-bottom: 8px;
+        }
+        .action-item {
+            padding: 8px 10px;
+            background: var(--bg-white);
+            border-radius: 4px;
+            margin-bottom: 6px;
+            font-size: 12px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            animation: slideIn 0.3s ease;
+        }
+        @keyframes slideIn {
+            from { opacity: 0; transform: translateX(-10px); }
+            to { opacity: 1; transform: translateX(0); }
+        }
+        .action-item .icon { font-size: 14px; }
+        .action-item.pending { border-left: 3px solid var(--nhs-orange); }
+        .action-item.complete { border-left: 3px solid var(--nhs-green); }
+        .action-item.urgent { border-left: 3px solid var(--nhs-red); background: #fef2f2; }
+
+        /* Transcript */
+        .transcript {
+            flex: 1;
+            overflow-y: auto;
+            padding: 12px;
+        }
+        .transcript-entry {
+            margin-bottom: 10px;
+            padding: 10px;
+            background: var(--bg);
+            border-radius: 6px;
+        }
+        .transcript-entry .role {
+            font-size: 10px;
+            font-weight: 700;
+            text-transform: uppercase;
+            margin-bottom: 4px;
+        }
+        .transcript-entry .role.assistant { color: var(--nhs-blue); }
+        .transcript-entry .role.user { color: var(--nhs-green); }
+        .transcript-entry .role.system { color: var(--text-dim); }
+        .transcript-entry .text { font-size: 13px; line-height: 1.5; }
+
+        /* Emergency Alert */
+        .emergency-overlay {
+            display: none;
+            position: fixed;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: rgba(218, 41, 28, 0.95);
+            z-index: 1000;
+            justify-content: center;
+            align-items: center;
+            flex-direction: column;
+            color: white;
+            animation: flashRed 0.5s infinite;
+        }
+        .emergency-overlay.active { display: flex; }
+        @keyframes flashRed {
+            0%, 100% { background: rgba(218, 41, 28, 0.95); }
+            50% { background: rgba(218, 41, 28, 0.8); }
+        }
+        .emergency-overlay h1 {
+            font-size: 64px;
+            font-weight: 700;
+            margin-bottom: 16px;
+        }
+        .emergency-overlay p {
+            font-size: 24px;
+            max-width: 600px;
+            text-align: center;
+        }
+        .emergency-overlay button {
+            margin-top: 32px;
+            padding: 16px 48px;
+            font-size: 18px;
+            font-weight: 700;
+            background: white;
+            color: var(--nhs-red);
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+        }
+
+        /* Outcome Panel */
+        .outcome-panel {
+            padding: 16px;
+            border-top: 1px solid var(--border);
+            display: none;
+        }
+        .outcome-panel.visible { display: block; }
+        .outcome-panel h4 { font-size: 12px; font-weight: 600; margin-bottom: 12px; }
+        .outcome-panel select, .outcome-panel textarea {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid var(--border);
+            font-family: inherit;
+            font-size: 13px;
+            margin-bottom: 8px;
+            border-radius: 4px;
+        }
+        .outcome-panel button {
+            width: 100%;
+            padding: 12px;
+            background: var(--nhs-blue);
+            color: white;
+            border: none;
+            font-weight: 600;
+            cursor: pointer;
+            border-radius: 4px;
+        }
+
+        .empty-state {
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            height: 100%;
+            color: var(--text-dim);
+        }
+        .empty-state h3 { font-size: 18px; margin-bottom: 8px; }
+    </style>
+</head>
+<body>
+    <!-- NHS Header with Stats -->
+    <header class="nhs-header">
+        <div class="nhs-logo">
+            <svg viewBox="0 0 100 40" fill="white">
+                <rect x="0" y="0" width="100" height="40" rx="4"/>
+                <text x="50" y="28" text-anchor="middle" font-size="22" font-weight="bold" fill="#005eb8">NHS</text>
+            </svg>
+            <h1>StrokeGuard AI</h1>
+        </div>
+        <div class="nhs-stats">
+            <div class="nhs-stat" id="simStatus" style="cursor: pointer;" onclick="toggleSimMode()" title="Click to toggle live simulation">
+                <div class="value" id="statSource">LOCAL</div>
+                <div class="label">Data Source</div>
+            </div>
+            <div class="nhs-stat">
+                <div class="value" id="statTotal">--</div>
+                <div class="label">Active Cases</div>
+            </div>
+            <div class="nhs-stat">
+                <div class="value" id="statCalled">--</div>
+                <div class="label">Called Today</div>
+            </div>
+            <div class="nhs-stat">
+                <div class="value" id="statEscalated">--</div>
+                <div class="label">Escalated</div>
+            </div>
+            <div class="nhs-stat">
+                <div class="value" id="statPrevented">--</div>
+                <div class="label">Interventions</div>
+            </div>
+        </div>
+    </header>
+
+    <!-- Emergency Alert Overlay -->
+    <div class="emergency-overlay" id="emergencyOverlay">
+        <h1>⚠️ 999 ALERT</h1>
+        <p id="emergencyReason">Patient reporting emergency symptoms. Advising to call 999 immediately.</p>
+        <button onclick="dismissEmergency()">Dismiss Alert</button>
+    </div>
+
+    <div class="layout">
+        <!-- Left: Patient List -->
+        <aside class="sidebar">
+            <div class="sidebar-header">
+                <h2>Priority Call List</h2>
+                <p>Patients requiring outreach</p>
+            </div>
+            <div class="filter-bar">
+                <button class="filter-btn active" onclick="filterBy('all')">All</button>
+                <button class="filter-btn" onclick="filterBy('critical')">Critical</button>
+                <button class="filter-btn" onclick="filterBy('high')">High</button>
+            </div>
+            <div class="patient-list" id="patientList"></div>
+        </aside>
+
+        <!-- Center: Patient Details -->
+        <main class="main" id="mainPanel">
+            <div class="empty-state">
+                <h3>Select a patient</h3>
+                <p>Choose a high-risk patient to review and call</p>
+            </div>
+        </main>
+
+        <!-- Right: Call Panel -->
+        <aside class="call-panel">
+            <div class="call-header">
+                <h2>Voice Agent</h2>
+                <div class="call-timer" id="callTimer">00:00</div>
+            </div>
+            <div class="call-status" id="callStatus">
+                <div class="state">Ready</div>
+                <div class="patient-id" id="callPatientId">Select patient</div>
+            </div>
+            <button class="call-btn start" id="callBtn" onclick="toggleCall()" disabled>
+                📞 WhatsApp Call
+            </button>
+            <button class="call-btn browser" id="browserCallBtn" onclick="startBrowserCall()" disabled style="background: var(--nhs-blue); margin-top: 8px;">
+                🎙️ Browser Call (Demo)
+            </button>
+
+            <!-- Live Action Feed -->
+            <div class="action-feed" id="actionFeed">
+                <h4>🔧 Agent Actions</h4>
+                <div id="actionList">
+                    <div style="color: var(--text-dim); font-size: 11px;">Actions will appear here during calls</div>
+                </div>
+            </div>
+
+            <div class="transcript" id="transcript">
+                <div style="color: var(--text-dim); text-align: center; padding: 40px 20px; font-size: 12px;">
+                    Conversation transcript will appear here
+                </div>
+            </div>
+
+            <div class="outcome-panel" id="outcomePanel">
+                <h4>Log Call Outcome</h4>
+                <select id="outcomeSelect">
+                    <option value="completed">Completed - Patient reached</option>
+                    <option value="followup">Follow-up scheduled</option>
+                    <option value="referred">Referred to clinician</option>
+                    <option value="urgent">Urgent escalation</option>
+                    <option value="callback">Callback requested</option>
+                </select>
+                <textarea id="outcomeNotes" rows="2" placeholder="Additional notes..."></textarea>
+                <button onclick="saveOutcome()">Save Outcome</button>
+            </div>
+        </aside>
+    </div>
+
+    <!-- Emergency Sound -->
+    <audio id="emergencySound" preload="auto">
+        <source src="data:audio/wav;base64,UklGRnoGAABXQVZFZm10IBAAAAABAAEAQB8AAEAfAAABAAgAZGF0YQoGAACBhYqFbF1fdJivrJBhNjVgodDbq2EcBj+a2teleEkqYJ/LupFkQi9Qk8OsiFxGM0qGt6J9VE89SX2spHZSTT1HdqSfcFFQPkdypJttU1E+Rnekm2dWUz5Gd6SYZFdVPkZ4pJVgWVc+RnsAAAA=" type="audio/wav">
+    </audio>
+
+    <script type="module">
+        import VapiModule from 'https://cdn.jsdelivr.net/npm/@vapi-ai/web@2.2.3/+esm';
+        const Vapi = VapiModule.default || VapiModule;
+
+        const VAPI_KEY = '75f4b121-88c0-4094-b9e4-5128210c41a4';
+        const WHATSAPP_SERVER = 'http://localhost:3001';
+        const DEFAULT_WHATSAPP_NUMBER = '+79854311122';
+
+        let vapi = null;
+        let patients = [];
+        let selectedPatient = null;
+        let isCallActive = false;
+        let currentFilter = 'all';
+        let callStartTime = null;
+        let timerInterval = null;
+        let activeWhatsAppCallId = null;
+        let useSimulation = false;  // Toggle for live NHS-SIM data
+
+        // Demo stats
+        const demoStats = { total: 0, called: 47, escalated: 3, prevented: 12 };
+
+        // Toggle between local data and live simulation
+        window.toggleSimMode = async function() {
+            useSimulation = !useSimulation;
+            const statusEl = document.getElementById('statSource');
+            const statusBox = document.getElementById('simStatus');
+
+            if (useSimulation) {
+                statusEl.textContent = 'LIVE';
+                statusEl.style.color = '#00ff00';
+                statusBox.style.background = 'rgba(0,150,57,0.3)';
+                statusBox.title = 'Connected to NHS-SIM live simulation';
+            } else {
+                statusEl.textContent = 'LOCAL';
+                statusEl.style.color = 'white';
+                statusBox.style.background = 'transparent';
+                statusBox.title = 'Using local patient data';
+            }
+
+            await loadPatients();
+        };
+
+        // Initialize VAPI
+        try {
+            vapi = new Vapi(VAPI_KEY);
+
+            vapi.on('call-start', () => {
+                isCallActive = true;
+                callStartTime = Date.now();
+                startTimer();
+                updateCallUI();
+                clearActions();
+                addTranscript('system', 'Connected to patient');
+                addAction('📞', 'Call connected', 'complete');
+            });
+
+            vapi.on('call-end', () => {
+                isCallActive = false;
+                stopTimer();
+                updateCallUI();
+                addTranscript('system', 'Call ended');
+                addAction('✅', 'Call completed', 'complete');
+                document.getElementById('outcomePanel').classList.add('visible');
+                demoStats.called++;
+                updateStats();
+            });
+
+            vapi.on('message', (msg) => {
+                if (msg.type === 'transcript' && msg.transcriptType === 'final') {
+                    addTranscript(msg.role, msg.transcript);
+                }
+                // Detect tool calls from function-call messages
+                if (msg.type === 'function-call') {
+                    handleToolCall(msg.functionCall);
+                }
+            });
+
+            vapi.on('error', (e) => {
+                console.error('VAPI error:', e);
+                addTranscript('system', 'Error: ' + (e.message || JSON.stringify(e)));
+            });
+        } catch (e) {
+            console.error('VAPI init failed:', e);
+        }
+
+        function handleToolCall(func) {
+            const name = func?.name || 'unknown';
+            const icons = {
+                'get_full_patient_record': '📋',
+                'get_risk_explanation': '⚠️',
+                'check_medication_compliance': '💊',
+                'schedule_gp_appointment': '📅',
+                'request_medication_review': '💊',
+                'order_investigation': '🔬',
+                'refer_to_specialist': '🏥',
+                'add_clinical_note': '📝',
+                'flag_urgent_review': '🚨',
+                'check_recent_results': '📊'
+            };
+            const labels = {
+                'get_full_patient_record': 'Pulling patient record...',
+                'get_risk_explanation': 'Analyzing risk factors...',
+                'check_medication_compliance': 'Checking medications...',
+                'schedule_gp_appointment': 'Booking GP appointment...',
+                'request_medication_review': 'Requesting medication review...',
+                'order_investigation': 'Ordering investigation...',
+                'refer_to_specialist': 'Creating specialist referral...',
+                'add_clinical_note': 'Adding clinical note...',
+                'flag_urgent_review': 'FLAGGING FOR URGENT REVIEW',
+                'check_recent_results': 'Checking recent results...'
+            };
+
+            const icon = icons[name] || '🔧';
+            const label = labels[name] || name;
+            const isUrgent = name === 'flag_urgent_review';
+
+            addAction(icon, label, isUrgent ? 'urgent' : 'pending');
+
+            // Trigger emergency overlay for urgent flags
+            if (isUrgent) {
+                triggerEmergency(func.parameters?.reason || 'Patient flagged for urgent clinical review');
+                demoStats.escalated++;
+                updateStats();
+            }
+
+            // Mark as complete after a delay
+            setTimeout(() => {
+                const items = document.querySelectorAll('.action-item.pending');
+                if (items.length > 0) {
+                    items[items.length - 1].classList.remove('pending');
+                    items[items.length - 1].classList.add('complete');
+                }
+                demoStats.prevented++;
+                updateStats();
+            }, 1500);
+        }
+
+        function triggerEmergency(reason) {
+            document.getElementById('emergencyReason').textContent = reason;
+            document.getElementById('emergencyOverlay').classList.add('active');
+            try { document.getElementById('emergencySound').play(); } catch(e) {}
+        }
+
+        window.dismissEmergency = function() {
+            document.getElementById('emergencyOverlay').classList.remove('active');
+        };
+
+        function startTimer() {
+            document.getElementById('callTimer').classList.add('active');
+            timerInterval = setInterval(() => {
+                const elapsed = Math.floor((Date.now() - callStartTime) / 1000);
+                const mins = Math.floor(elapsed / 60).toString().padStart(2, '0');
+                const secs = (elapsed % 60).toString().padStart(2, '0');
+                document.getElementById('callTimer').textContent = `${mins}:${secs}`;
+            }, 1000);
+        }
+
+        function stopTimer() {
+            clearInterval(timerInterval);
+            document.getElementById('callTimer').classList.remove('active');
+        }
+
+        function addAction(icon, text, status = 'pending') {
+            const list = document.getElementById('actionList');
+            if (list.querySelector('div[style]')) list.innerHTML = '';
+
+            const item = document.createElement('div');
+            item.className = `action-item ${status}`;
+            item.innerHTML = `<span class="icon">${icon}</span><span>${text}</span>`;
+            list.appendChild(item);
+            list.scrollTop = list.scrollHeight;
+        }
+
+        function clearActions() {
+            document.getElementById('actionList').innerHTML = '';
+        }
+
+        async function loadPatients() {
+            if (useSimulation) {
+                // Fetch from live NHS-SIM
+                try {
+                    const resp = await fetch('/api/sim/patients');
+                    const data = await resp.json();
+                    patients = data.patients || [];
+
+                    // Transform sim patients to display format
+                    patients = patients.map(p => ({
+                        ...p,
+                        stroke_risk: p.priority === 'urgent' ? 0.25 : 0.1,
+                        age: 65,
+                        sex: 'Unknown',
+                        sbp: 140,
+                        dbp: 85,
+                        smoking: false
+                    }));
+
+                    // Sort by number of resources (more = higher priority)
+                    patients.sort((a, b) => (b.resources?.length || 0) - (a.resources?.length || 0));
+                    demoStats.total = patients.filter(p => p.priority === 'urgent').length;
+                } catch (e) {
+                    console.error('Failed to load sim patients:', e);
+                    useSimulation = false;
+                    document.getElementById('statSource').textContent = 'LOCAL';
+                    return loadPatients();
+                }
+            } else {
+                // Fetch from local data
+                const resp = await fetch('/api/patients?limit=200');
+                patients = await resp.json();
+                // Sort by risk
+                patients.sort((a, b) => (b.stroke_risk || 0) - (a.stroke_risk || 0));
+                demoStats.total = patients.filter(p => p.stroke_risk > 0.15).length;
+            }
+
+            updateStats();
+            renderPatientList();
+        }
+
+        function updateStats() {
+            document.getElementById('statTotal').textContent = demoStats.total.toLocaleString();
+            document.getElementById('statCalled').textContent = demoStats.called;
+            document.getElementById('statEscalated').textContent = demoStats.escalated;
+            document.getElementById('statPrevented').textContent = demoStats.prevented;
+        }
+
+        function renderPatientList() {
+            const list = document.getElementById('patientList');
+            let filtered = patients;
+
+            if (useSimulation) {
+                // Filter by priority for simulation data
+                if (currentFilter === 'critical') {
+                    filtered = patients.filter(p => p.priority === 'urgent');
+                } else if (currentFilter === 'high') {
+                    filtered = patients.filter(p => (p.resources?.length || 0) > 3);
+                }
+            } else {
+                if (currentFilter === 'critical') {
+                    filtered = patients.filter(p => p.stroke_risk > 0.25);
+                } else if (currentFilter === 'high') {
+                    filtered = patients.filter(p => p.stroke_risk > 0.15 && p.stroke_risk <= 0.25);
+                }
+            }
+
+            list.innerHTML = filtered.slice(0, 100).map(p => {
+                if (useSimulation) {
+                    // Simulation patient format
+                    const resourceCount = p.resources?.length || 0;
+                    const urgentClass = p.priority === 'urgent' ? 'critical' : resourceCount > 3 ? 'high' : 'medium';
+                    const condText = p.conditions?.slice(0, 2).map(c => c.term).join(', ') || 'No conditions';
+                    return `
+                        <div class="patient-item ${selectedPatient?.id === p.id ? 'selected' : ''}"
+                             onclick="selectPatient('${p.id}')">
+                            <div class="info">
+                                <div class="id">${p.id}</div>
+                                <div class="meta">${condText}</div>
+                            </div>
+                            <div class="risk-badge ${urgentClass}">${resourceCount} tasks</div>
+                        </div>
+                    `;
+                } else {
+                    // Local patient format
+                    const risk = (p.stroke_risk * 100).toFixed(0);
+                    const riskClass = p.stroke_risk > 0.25 ? 'critical' : p.stroke_risk > 0.15 ? 'high' : p.stroke_risk > 0.08 ? 'medium' : 'low';
+                    return `
+                        <div class="patient-item ${selectedPatient?.id === p.id ? 'selected' : ''}"
+                             onclick="selectPatient('${p.id}')">
+                            <div class="info">
+                                <div class="id">${p.id}</div>
+                                <div class="meta">${p.age}y ${p.sex} | BP ${p.sbp}/${p.dbp}</div>
+                            </div>
+                            <div class="risk-badge ${riskClass}">${risk}%</div>
+                        </div>
+                    `;
+                }
+            }).join('');
+        }
+
+        window.filterBy = function(filter) {
+            currentFilter = filter;
+            document.querySelectorAll('.filter-btn').forEach(btn => {
+                btn.classList.toggle('active', btn.textContent.toLowerCase() === filter);
+            });
+            renderPatientList();
+        };
+
+        window.selectPatient = async function(patientId) {
+            let patient;
+
+            if (useSimulation) {
+                // Fetch from simulation
+                const resp = await fetch(`/api/sim/patient/${patientId}`);
+                const data = await resp.json();
+                if (data.error) {
+                    // Fall back to cached patient data
+                    patient = patients.find(p => p.id === patientId);
+                } else {
+                    // Transform sim data to display format
+                    const conditions = data.ehr?.problems?.map(p => ({term: p.term, date: p.date})) || [];
+                    patient = {
+                        id: patientId,
+                        source: 'nhs-sim',
+                        age: 65,
+                        sex: 'Unknown',
+                        sbp: 140,
+                        dbp: 85,
+                        smoking: false,
+                        stroke_risk: 0.2,
+                        conditions: conditions,
+                        events: data.resources?.map(r => ({
+                            type: r.kind,
+                            title: r.title,
+                            detail: JSON.stringify(r.data),
+                            date: new Date(r.createdAt).toISOString().split('T')[0],
+                            priority: r.priority
+                        })) || []
+                    };
+                }
+            } else {
+                const resp = await fetch(`/api/patient/${patientId}`);
+                patient = await resp.json();
+                if (patient.error) return;
+            }
+
+            selectedPatient = patient;
+            renderPatientList();
+            renderPatientDetails(patient);
+
+            document.getElementById('callPatientId').textContent = patientId;
+            document.getElementById('callBtn').disabled = false;
+            document.getElementById('browserCallBtn').disabled = false;
+        };
+
+        function renderPatientDetails(p) {
+            const risk = p.stroke_risk || 0;
+            const riskClass = risk > 0.25 ? 'red' : risk > 0.15 ? 'orange' : 'green';
+            const events = (p.events || []).slice().reverse();
+            const conditions = p.conditions || [];
+
+            // Generate pre-call briefing
+            const briefingPoints = [];
+            const condTerms = conditions.map(c => c.term.toLowerCase());
+
+            if (condTerms.some(c => c.includes('atrial') || c.includes('fibrillation'))) {
+                briefingPoints.push('AF patient - check anticoagulation compliance');
+            }
+            if (condTerms.some(c => c.includes('hypertension'))) {
+                briefingPoints.push('Hypertensive - review BP control and medication adherence');
+            }
+            if (condTerms.some(c => c.includes('diabetes'))) {
+                briefingPoints.push('Diabetic - check HbA1c and glucose monitoring');
+            }
+            if (p.smoking) {
+                briefingPoints.push('Current smoker - offer cessation support');
+            }
+            if (p.sbp > 150) {
+                briefingPoints.push(`BP ${p.sbp}/${p.dbp} elevated - discuss medication`);
+            }
+            if (risk > 0.2) {
+                briefingPoints.push('HIGH RISK - recommend urgent GP follow-up');
+            }
+
+            document.getElementById('mainPanel').innerHTML = `
+                <div class="patient-header">
+                    <div class="top-row">
+                        <div>
+                            <h2>${p.id}</h2>
+                            <div class="subtitle">${p.age} years, ${p.sex} | ${conditions.slice(0, 3).map(c => c.term).join(', ')}</div>
+                        </div>
+                        <div class="risk-badge ${risk > 0.25 ? 'critical' : risk > 0.15 ? 'high' : 'medium'}" style="font-size: 16px; padding: 8px 16px;">
+                            ${(risk * 100).toFixed(1)}% Risk
+                        </div>
+                    </div>
+                    <div class="stats-grid">
+                        <div class="stat-box">
+                            <div class="label">Stroke Risk</div>
+                            <div class="value ${riskClass}">${(risk * 100).toFixed(1)}%</div>
+                        </div>
+                        <div class="stat-box">
+                            <div class="label">Blood Pressure</div>
+                            <div class="value">${p.sbp}/${p.dbp}</div>
+                        </div>
+                        <div class="stat-box">
+                            <div class="label">Age</div>
+                            <div class="value">${p.age}</div>
+                        </div>
+                        <div class="stat-box">
+                            <div class="label">Smoking</div>
+                            <div class="value">${p.smoking ? '🚬 Yes' : 'No'}</div>
+                        </div>
+                        <div class="stat-box">
+                            <div class="label">Conditions</div>
+                            <div class="value">${conditions.length}</div>
+                        </div>
+                    </div>
+                </div>
+                <div class="content-scroll">
+                    ${briefingPoints.length > 0 ? `
+                    <div class="briefing-panel">
+                        <h4>📋 Pre-Call Briefing</h4>
+                        <ul>
+                            ${briefingPoints.map(b => `<li>${b}</li>`).join('')}
+                        </ul>
+                    </div>
+                    ` : ''}
+                    <div class="section">
+                        <h3>Active Conditions</h3>
+                        <div class="conditions-list">
+                            ${conditions.map(c => `<span class="condition-tag">${c.term}</span>`).join('')}
+                        </div>
+                    </div>
+                    <div class="section">
+                        <h3>Clinical Timeline</h3>
+                        <div class="timeline">
+                            ${events.slice(0, 15).map(e => `
+                                <div class="event-item" onclick="this.classList.toggle('expanded')">
+                                    <div class="header">
+                                        <div>
+                                            <div class="title">${e.title || e.type}</div>
+                                            <div class="date">${e.date}</div>
+                                        </div>
+                                        <span class="type-badge">${e.type}</span>
+                                    </div>
+                                    <div class="report-content">${e.detail || e.report_text || 'No additional details'}</div>
+                                </div>
+                            `).join('')}
+                        </div>
+                    </div>
+                </div>
+            `;
+        }
+
+        function updateCallUI() {
+            const btn = document.getElementById('callBtn');
+            const browserBtn = document.getElementById('browserCallBtn');
+            const status = document.getElementById('callStatus');
+
+            if (isCallActive) {
+                btn.className = 'call-btn end';
+                btn.innerHTML = '📵 End Call';
+                browserBtn.className = 'call-btn end';
+                browserBtn.innerHTML = '📵 End Call';
+                browserBtn.style.background = 'var(--nhs-red)';
+                status.classList.add('active');
+                status.querySelector('.state').textContent = '🔴 In Call';
+            } else {
+                btn.className = 'call-btn start';
+                btn.innerHTML = '📞 WhatsApp Call';
+                btn.disabled = !selectedPatient;
+                browserBtn.className = 'call-btn browser';
+                browserBtn.innerHTML = '🎙️ Browser Call (Demo)';
+                browserBtn.disabled = !selectedPatient;
+                browserBtn.style.background = 'var(--nhs-blue)';
+                status.classList.remove('active');
+                status.querySelector('.state').textContent = 'Ready';
+            }
+        }
+
+        window.toggleCall = async function() {
+            if (isCallActive) {
+                if (activeWhatsAppCallId) {
+                    await fetch(`${WHATSAPP_SERVER}/hangup`, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ callId: activeWhatsAppCallId })
+                    }).catch(() => {});
+                }
+                isCallActive = false;
+                stopTimer();
+                updateCallUI();
+                addTranscript('system', 'Call ended');
+                return;
+            }
+
+            if (!selectedPatient) return;
+
+            const p = selectedPatient;
+            document.getElementById('transcript').innerHTML = '';
+            document.getElementById('outcomePanel').classList.remove('visible');
+            clearActions();
+
+            // Use the running server if healthy; otherwise start it
+            try {
+                let healthy = false;
+                try {
+                    const status = await fetch('/api/whatsapp/status').then(r => r.json());
+                    healthy = status.running && status.data?.whatsappConnected;
+                } catch {}
+
+                if (!healthy) {
+                    addTranscript('system', 'Starting WhatsApp server...');
+                    addAction('🔄', 'Starting WhatsApp server', 'pending');
+                    const startResp = await fetch('/api/whatsapp/start', { method: 'POST' });
+                    const startData = await startResp.json();
+
+                    if (startData.status !== 'started' && startData.status !== 'already_running') {
+                        throw new Error(startData.error || 'Failed to start WhatsApp server');
+                    }
+
+                    // Wait for WhatsApp to actually connect (poll status)
+                    addAction('📱', 'Connecting to WhatsApp...', 'pending');
+                    let connected = false;
+                    for (let i = 0; i < 20; i++) {
+                        await new Promise(r => setTimeout(r, 1000));
+                        try {
+                            const status = await fetch('/api/whatsapp/status').then(r => r.json());
+                            if (status.running && status.data?.whatsappConnected) {
+                                connected = true;
+                                break;
+                            }
+                        } catch {}
+                    }
+
+                    if (!connected) {
+                        throw new Error('WhatsApp did not connect in time');
+                    }
+                }
+
+                addAction('✅', 'WhatsApp connected', 'complete');
+            } catch (e) {
+                addTranscript('system', 'Error: ' + e.message);
+                addAction('❌', 'Server start failed', 'failed');
+                return;
+            }
+
+            addTranscript('system', 'Connecting via WhatsApp...');
+
+            try {
+                const resp = await fetch(`${WHATSAPP_SERVER}/call`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        phoneNumber: DEFAULT_WHATSAPP_NUMBER,
+                        patientId: p.id
+                    })
+                });
+                const data = await resp.json();
+                if (data.error) throw new Error(data.error);
+
+                activeWhatsAppCallId = data.callId;
+                isCallActive = true;
+                callStartTime = Date.now();
+                startTimer();
+                updateCallUI();
+                addTranscript('system', 'WhatsApp call initiated');
+                addAction('📱', 'WhatsApp call started', 'complete');
+
+                // Poll for call status and messages
+                let lastMessageCount = 0;
+                let wasConnected = false;
+                const statusPoll = setInterval(async () => {
+                    try {
+                        const status = await fetch(`${WHATSAPP_SERVER}/status`).then(r => r.json());
+                        const call = status.calls?.find(c => c.id === activeWhatsAppCallId);
+
+                        if ((call?.status === 'connected' || call?.status === 'in-conversation') && !wasConnected) {
+                            wasConnected = true;
+                            addTranscript('system', 'Call connected — AI agent live');
+                            addAction('✅', 'Patient answered', 'complete');
+                            addAction('🤖', 'VAPI voice agent active', 'complete');
+                        }
+
+                        // Display new messages
+                        if (call?.messages && call.messages.length > lastMessageCount) {
+                            for (let i = lastMessageCount; i < call.messages.length; i++) {
+                                const msg = call.messages[i];
+                                addTranscript(msg.role === 'assistant' ? 'assistant' : 'user', msg.content);
+                            }
+                            lastMessageCount = call.messages.length;
+                        }
+
+                        if (call?.status === 'ended' || !call) {
+                            isCallActive = false;
+                            stopTimer();
+                            updateCallUI();
+                            addTranscript('system', 'Call ended');
+                            document.getElementById('outcomePanel').classList.add('visible');
+                            clearInterval(statusPoll);
+                        }
+                    } catch (e) {}
+                }, 1000);
+
+            } catch (e) {
+                console.error('WhatsApp call failed:', e);
+                addTranscript('system', 'WhatsApp call failed: ' + e.message);
+                addTranscript('system', 'Make sure WhatsApp server is running: node whatsapp_voice_server_v2.mjs');
+            }
+        };
+
+        function addTranscript(role, text) {
+            const container = document.getElementById('transcript');
+            if (container.querySelector('div[style]')) container.innerHTML = '';
+
+            const entry = document.createElement('div');
+            entry.className = 'transcript-entry';
+            entry.innerHTML = `<div class="role ${role}">${role}</div><div class="text">${text}</div>`;
+            container.appendChild(entry);
+            container.scrollTop = container.scrollHeight;
+        }
+
+        window.saveOutcome = async function() {
+            if (!selectedPatient) return;
+
+            await fetch('/api/outreach/complete', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    patient_id: selectedPatient.id,
+                    outcome: document.getElementById('outcomeSelect').value,
+                    notes: document.getElementById('outcomeNotes').value
+                })
+            }).catch(() => {});
+
+            document.getElementById('outcomePanel').classList.remove('visible');
+            document.getElementById('outcomeNotes').value = '';
+        };
+
+        // Browser-based VAPI call (uses device mic/speaker)
+        window.startBrowserCall = async function() {
+            if (isCallActive) {
+                vapi.stop();
+                return;
+            }
+
+            if (!selectedPatient || !vapi) return;
+
+            const p = selectedPatient;
+            document.getElementById('transcript').innerHTML = '';
+            document.getElementById('outcomePanel').classList.remove('visible');
+            clearActions();
+            addTranscript('system', 'Starting browser call...');
+            addAction('🎙️', 'Connecting via browser', 'pending');
+
+            const conditions = (p.conditions || []).map(c => c.term).join(', ');
+            const riskPct = ((p.stroke_risk || 0) * 100).toFixed(1);
+
+            try {
+                await vapi.start({
+                    transcriber: { provider: "deepgram", model: "nova-2", language: "en-GB" },
+                    model: {
+                        provider: "openai",
+                        model: "gpt-4o",
+                        messages: [{
+                            role: "system",
+                            content: `You are an NHS StrokeGuard clinical AI agent making a proactive welfare call.
+
+PATIENT: ${p.id}
+Age: ${p.age}, Sex: ${p.sex}
+Blood Pressure: ${p.sbp}/${p.dbp} mmHg
+Stroke Risk Score: ${riskPct}%
+Conditions: ${conditions}
+Smoker: ${p.smoking ? 'Yes' : 'No'}
+
+YOUR ROLE: Conduct a clinical welfare check. You can:
+- Explain their stroke risk factors in plain language
+- Discuss their conditions and what they mean
+- Answer questions about their health
+- Offer to schedule a GP follow-up if needed
+
+COMMUNICATION:
+- Warm, professional, reassuring
+- Plain English, no jargon
+- 2-3 sentences per response
+
+EMERGENCY: If sudden weakness, facial drooping, slurred speech, severe headache, chest pain - tell them to CALL 999 IMMEDIATELY.`
+                        }]
+                    },
+                    voice: { provider: "11labs", voiceId: "TxGEqnHWrfWFTfGW9XjX" },
+                    firstMessage: `Hello, this is the NHS StrokeGuard patient support service. Am I speaking with ${p.id}? I'm calling to check in on how you're doing with your health.`
+                });
+                addAction('✅', 'Browser call connected', 'complete');
+            } catch (e) {
+                console.error('Browser call failed:', e);
+                addTranscript('system', 'Failed: ' + e.message);
+                addAction('❌', 'Call failed', 'failed');
+            }
+        };
+
+        // Demo Mode - Simulated call flow for presentations
+        let demoActive = false;
+        let demoStep = 0;
+
+        const DEMO_SCRIPT = [
+            { type: 'transcript', role: 'system', text: 'Connecting...' },
+            { type: 'transcript', role: 'system', text: 'Connected to patient', delay: 1000 },
+            { type: 'action', icon: '📞', text: 'Call connected', status: 'complete' },
+            { type: 'transcript', role: 'assistant', text: 'Hello, this is the NHS StrokeGuard patient support service. Am I speaking with the patient? I\'m calling to check in on how you\'re doing with your health today.', delay: 1500 },
+            { type: 'transcript', role: 'user', text: 'Yes, hello. I\'ve been having some trouble with my medications lately.', delay: 4000 },
+            { type: 'action', icon: '📋', text: 'Pulling patient record...', status: 'pending', delay: 500 },
+            { type: 'action_complete', delay: 1500 },
+            { type: 'transcript', role: 'assistant', text: 'I understand. I can see from your records that you\'re currently on several medications for your atrial fibrillation and blood pressure. Can you tell me more about the trouble you\'re experiencing?', delay: 2000 },
+            { type: 'transcript', role: 'user', text: 'I keep forgetting to take my evening dose. And sometimes I feel a bit dizzy when I stand up.', delay: 4000 },
+            { type: 'action', icon: '💊', text: 'Checking medications...', status: 'pending', delay: 500 },
+            { type: 'action_complete', delay: 1200 },
+            { type: 'transcript', role: 'assistant', text: 'Thank you for sharing that. The dizziness when standing could be related to your blood pressure medication. Given your elevated stroke risk at 27%, I\'d like to arrange a medication review with your pharmacist. Would that be helpful?', delay: 2500 },
+            { type: 'transcript', role: 'user', text: 'Yes please, that would be good.', delay: 3000 },
+            { type: 'action', icon: '💊', text: 'Requesting medication review...', status: 'pending', delay: 500 },
+            { type: 'action_complete', delay: 1200 },
+            { type: 'stat_update', field: 'prevented', delta: 1, delay: 500 },
+            { type: 'transcript', role: 'assistant', text: 'Perfect, I\'ve requested an urgent medication review. Your pharmacist will contact you within 24 hours. Given your history of atrial fibrillation, I\'d also recommend we book you in with your GP for a review. Shall I schedule that?', delay: 2000 },
+            { type: 'transcript', role: 'user', text: 'Actually, I\'ve also been having some chest tightness this morning. Is that something to worry about?', delay: 3500 },
+            { type: 'action', icon: '🚨', text: 'FLAGGING FOR URGENT REVIEW', status: 'urgent', delay: 800 },
+            { type: 'emergency', reason: 'Patient reporting chest tightness with history of AF. Flagging for immediate clinical review.', delay: 500 },
+            { type: 'stat_update', field: 'escalated', delta: 1, delay: 200 },
+            { type: 'transcript', role: 'assistant', text: 'I\'m concerned about that chest tightness, especially given your heart condition. I\'ve flagged you for urgent same-day review. The duty GP will call you back within 2 hours. If the tightness gets worse, or you experience sudden weakness, facial drooping, or difficulty speaking, please call 999 immediately.', delay: 2500 },
+            { type: 'transcript', role: 'user', text: 'Okay, thank you for taking this seriously.', delay: 3000 },
+            { type: 'action', icon: '📝', text: 'Adding clinical note...', status: 'pending', delay: 500 },
+            { type: 'action_complete', delay: 1000 },
+            { type: 'transcript', role: 'assistant', text: 'Of course. I\'ve documented everything in your record. Is there anything else you\'d like to discuss before I go?', delay: 2000 },
+            { type: 'transcript', role: 'user', text: 'No, that\'s everything. Thank you for calling.', delay: 2500 },
+            { type: 'transcript', role: 'assistant', text: 'Take care, and remember to answer when the GP calls back. If you need anything, the practice number is on your repeat prescription. Goodbye.', delay: 2000 },
+            { type: 'action', icon: '✅', text: 'Call completed', status: 'complete', delay: 1000 },
+            { type: 'call_end', delay: 500 }
+        ];
+
+        window.startDemoMode = async function() {
+            if (!selectedPatient) {
+                // Auto-select first high-risk patient for demo
+                const highRisk = patients.find(p => p.stroke_risk > 0.25);
+                if (highRisk) await selectPatient(highRisk.id);
+            }
+
+            if (!selectedPatient) {
+                alert('Please select a patient first');
+                return;
+            }
+
+            demoActive = true;
+            demoStep = 0;
+            isCallActive = true;
+            callStartTime = Date.now();
+            startTimer();
+            updateCallUI();
+            clearActions();
+            document.getElementById('transcript').innerHTML = '';
+            document.getElementById('outcomePanel').classList.remove('visible');
+            document.getElementById('demoBtn').disabled = true;
+            document.getElementById('demoBtn').innerHTML = '🎬 Running Demo...';
+
+            runDemoStep();
+        };
+
+        function runDemoStep() {
+            if (!demoActive || demoStep >= DEMO_SCRIPT.length) {
+                endDemo();
+                return;
+            }
+
+            const step = DEMO_SCRIPT[demoStep];
+            const delay = step.delay || 2000;
+
+            setTimeout(() => {
+                if (!demoActive) return;
+
+                switch(step.type) {
+                    case 'transcript':
+                        addTranscript(step.role, step.text);
+                        break;
+                    case 'action':
+                        addAction(step.icon, step.text, step.status);
+                        break;
+                    case 'action_complete':
+                        const pending = document.querySelectorAll('.action-item.pending');
+                        if (pending.length > 0) {
+                            pending[pending.length - 1].classList.remove('pending');
+                            pending[pending.length - 1].classList.add('complete');
+                        }
+                        break;
+                    case 'emergency':
+                        triggerEmergency(step.reason);
+                        break;
+                    case 'stat_update':
+                        demoStats[step.field] += step.delta;
+                        updateStats();
+                        break;
+                    case 'call_end':
+                        isCallActive = false;
+                        stopTimer();
+                        updateCallUI();
+                        demoStats.called++;
+                        updateStats();
+                        document.getElementById('outcomePanel').classList.add('visible');
+                        break;
+                }
+
+                demoStep++;
+                runDemoStep();
+            }, delay);
+        }
+
+        function endDemo() {
+            demoActive = false;
+            document.getElementById('demoBtn').disabled = false;
+            document.getElementById('demoBtn').innerHTML = '🎬 Demo Mode';
+        }
+
+        // SSE listener for real-time tool events from server
+        function connectSSE() {
+            try {
+                const evtSource = new EventSource('/api/events');
+                evtSource.onmessage = (e) => {
+                    const data = JSON.parse(e.data);
+                    if (data.type === 'tool_call' && isCallActive) {
+                        // Real-time tool update from server
+                        const icons = {
+                            'get_full_patient_record': '📋',
+                            'get_risk_explanation': '⚠️',
+                            'check_medication_compliance': '💊',
+                            'schedule_gp_appointment': '📅',
+                            'request_medication_review': '💊',
+                            'order_investigation': '🔬',
+                            'refer_to_specialist': '🏥',
+                            'add_clinical_note': '📝',
+                            'flag_urgent_review': '🚨',
+                            'check_recent_results': '📊'
+                        };
+                        const icon = icons[data.tool] || '🔧';
+                        addAction(icon, `${data.tool} completed`, 'complete');
+
+                        if (data.tool === 'flag_urgent_review') {
+                            triggerEmergency(data.result?.reason || 'Patient flagged for urgent review');
+                        }
+                    }
+                };
+                evtSource.onerror = () => {
+                    evtSource.close();
+                    setTimeout(connectSSE, 5000);
+                };
+            } catch(e) {
+                console.log('SSE not available');
+            }
+        }
+
+        // Initialize
+        loadPatients();
+        connectSSE();
+    </script>
+</body>
+</html>

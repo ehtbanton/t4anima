@@ -1,0 +1,388 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>NHS StrokeGuard - Dashboard</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --nhs-blue: #005eb8;
+            --nhs-dark-blue: #003087;
+            --nhs-green: #009639;
+            --nhs-red: #da291c;
+            --nhs-orange: #ed8b00;
+            --bg: #f0f4f5;
+            --bg-white: #ffffff;
+            --text: #212b32;
+        }
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body {
+            font-family: 'Inter', Arial, sans-serif;
+            background: linear-gradient(135deg, var(--nhs-dark-blue) 0%, var(--nhs-blue) 100%);
+            color: white;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        header {
+            padding: 32px 48px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+        }
+        .logo svg { height: 48px; }
+        .logo h1 { font-size: 28px; font-weight: 700; }
+        .live-badge {
+            background: var(--nhs-green);
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 700;
+            animation: pulse 2s infinite;
+        }
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.7; }
+        }
+
+        main {
+            flex: 1;
+            padding: 0 48px 48px;
+            display: flex;
+            flex-direction: column;
+            gap: 32px;
+        }
+
+        .hero {
+            text-align: center;
+            padding: 40px 0;
+        }
+        .hero h2 {
+            font-size: 48px;
+            font-weight: 800;
+            margin-bottom: 16px;
+        }
+        .hero p {
+            font-size: 20px;
+            opacity: 0.9;
+            max-width: 700px;
+            margin: 0 auto;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 24px;
+        }
+        .stat-card {
+            background: rgba(255,255,255,0.1);
+            backdrop-filter: blur(10px);
+            border-radius: 16px;
+            padding: 32px;
+            text-align: center;
+            border: 1px solid rgba(255,255,255,0.2);
+        }
+        .stat-card .value {
+            font-size: 56px;
+            font-weight: 800;
+            line-height: 1;
+        }
+        .stat-card .label {
+            font-size: 14px;
+            margin-top: 12px;
+            opacity: 0.9;
+        }
+        .stat-card .delta {
+            font-size: 12px;
+            margin-top: 8px;
+            padding: 4px 12px;
+            border-radius: 12px;
+            display: inline-block;
+        }
+        .stat-card .delta.up { background: var(--nhs-green); }
+        .stat-card .delta.down { background: var(--nhs-red); }
+
+        .bottom-section {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 24px;
+        }
+
+        .panel {
+            background: var(--bg-white);
+            border-radius: 16px;
+            padding: 24px;
+            color: var(--text);
+        }
+        .panel h3 {
+            font-size: 14px;
+            font-weight: 700;
+            color: var(--nhs-dark-blue);
+            margin-bottom: 16px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .activity-list {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+        .activity-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 12px;
+            background: var(--bg);
+            border-radius: 8px;
+        }
+        .activity-item .icon {
+            width: 36px;
+            height: 36px;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 18px;
+        }
+        .activity-item .icon.call { background: #dbeafe; }
+        .activity-item .icon.alert { background: #fee2e2; }
+        .activity-item .icon.schedule { background: #d1fae5; }
+        .activity-item .text { flex: 1; font-size: 13px; }
+        .activity-item .time { font-size: 11px; color: #64748b; }
+
+        .risk-breakdown {
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+        }
+        .risk-bar {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+        .risk-bar .label {
+            width: 80px;
+            font-size: 12px;
+            font-weight: 600;
+        }
+        .risk-bar .bar {
+            flex: 1;
+            height: 24px;
+            background: var(--bg);
+            border-radius: 4px;
+            overflow: hidden;
+        }
+        .risk-bar .fill {
+            height: 100%;
+            border-radius: 4px;
+            display: flex;
+            align-items: center;
+            justify-content: flex-end;
+            padding-right: 8px;
+            font-size: 11px;
+            font-weight: 600;
+            color: white;
+        }
+        .risk-bar .fill.critical { background: var(--nhs-red); }
+        .risk-bar .fill.high { background: var(--nhs-orange); }
+        .risk-bar .fill.medium { background: #fbbf24; color: #000; }
+        .risk-bar .fill.low { background: var(--nhs-green); }
+
+        .cta-button {
+            display: inline-flex;
+            align-items: center;
+            gap: 12px;
+            background: var(--nhs-green);
+            color: white;
+            padding: 20px 40px;
+            border-radius: 12px;
+            font-size: 18px;
+            font-weight: 700;
+            text-decoration: none;
+            margin-top: 32px;
+            transition: transform 0.2s;
+        }
+        .cta-button:hover { transform: scale(1.02); }
+    </style>
+</head>
+<body>
+    <header>
+        <div class="logo">
+            <svg viewBox="0 0 100 40" fill="white">
+                <rect x="0" y="0" width="100" height="40" rx="4"/>
+                <text x="50" y="28" text-anchor="middle" font-size="22" font-weight="bold" fill="#005eb8">NHS</text>
+            </svg>
+            <h1>StrokeGuard AI</h1>
+        </div>
+        <div class="live-badge">● LIVE</div>
+    </header>
+
+    <main>
+        <div class="hero">
+            <h2>Preventing Strokes with AI</h2>
+            <p>Autonomous voice agents proactively calling high-risk patients, assessing health, and taking real clinical actions.</p>
+        </div>
+
+        <div class="stats-grid">
+            <div class="stat-card">
+                <div class="value" id="totalPatients">50,000</div>
+                <div class="label">Total Patients</div>
+            </div>
+            <div class="stat-card">
+                <div class="value" id="highRisk">8,247</div>
+                <div class="label">High Risk (>15%)</div>
+                <div class="delta up">↑ 3.2% from last month</div>
+            </div>
+            <div class="stat-card">
+                <div class="value" id="calledToday">342</div>
+                <div class="label">Called This Week</div>
+                <div class="delta up">↑ 89% vs manual</div>
+            </div>
+            <div class="stat-card">
+                <div class="value" id="interventions">47</div>
+                <div class="label">Interventions Made</div>
+                <div class="delta up">↑ Strokes prevented</div>
+            </div>
+        </div>
+
+        <div class="bottom-section">
+            <div class="panel">
+                <h3>Live Agent Activity</h3>
+                <div class="activity-list" id="activityList">
+                    <div class="activity-item">
+                        <div class="icon call">📞</div>
+                        <div class="text">Called P08234 - scheduled urgent GP follow-up</div>
+                        <div class="time">2 min ago</div>
+                    </div>
+                    <div class="activity-item">
+                        <div class="icon alert">🚨</div>
+                        <div class="text">Flagged P12891 for same-day review - chest tightness</div>
+                        <div class="time">8 min ago</div>
+                    </div>
+                    <div class="activity-item">
+                        <div class="icon schedule">📅</div>
+                        <div class="text">Booked blood tests for P04521 - lipid panel</div>
+                        <div class="time">15 min ago</div>
+                    </div>
+                    <div class="activity-item">
+                        <div class="icon call">📞</div>
+                        <div class="text">Called P31092 - medication review requested</div>
+                        <div class="time">22 min ago</div>
+                    </div>
+                </div>
+            </div>
+            <div class="panel">
+                <h3>Patient Risk Distribution</h3>
+                <div class="risk-breakdown">
+                    <div class="risk-bar">
+                        <div class="label">Critical</div>
+                        <div class="bar"><div class="fill critical" style="width: 8%">412</div></div>
+                    </div>
+                    <div class="risk-bar">
+                        <div class="label">High</div>
+                        <div class="bar"><div class="fill high" style="width: 15%">7,835</div></div>
+                    </div>
+                    <div class="risk-bar">
+                        <div class="label">Medium</div>
+                        <div class="bar"><div class="fill medium" style="width: 35%">17,521</div></div>
+                    </div>
+                    <div class="risk-bar">
+                        <div class="label">Low</div>
+                        <div class="bar"><div class="fill low" style="width: 42%">24,232</div></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div style="text-align: center;">
+            <a href="/strokeguard.html" class="cta-button">
+                📞 Open Call Center
+            </a>
+        </div>
+    </main>
+
+    <script>
+        // Animate numbers on load
+        function animateValue(id, start, end, duration) {
+            const obj = document.getElementById(id);
+            const range = end - start;
+            const startTime = performance.now();
+
+            function update(currentTime) {
+                const elapsed = currentTime - startTime;
+                const progress = Math.min(elapsed / duration, 1);
+                const value = Math.floor(start + range * progress);
+                obj.textContent = value.toLocaleString();
+                if (progress < 1) requestAnimationFrame(update);
+            }
+            requestAnimationFrame(update);
+        }
+
+        // Load real stats
+        async function loadStats() {
+            try {
+                const resp = await fetch('/api/patients?limit=50000');
+                const patients = await resp.json();
+
+                const total = patients.length;
+                const highRisk = patients.filter(p => p.stroke_risk > 0.15).length;
+                const critical = patients.filter(p => p.stroke_risk > 0.25).length;
+
+                animateValue('totalPatients', 0, total, 1500);
+                animateValue('highRisk', 0, highRisk, 1500);
+            } catch (e) {
+                console.error('Failed to load stats:', e);
+            }
+        }
+
+        loadStats();
+
+        // Simulate live activity
+        const activities = [
+            { icon: '📞', iconClass: 'call', text: 'Called P{id} - wellness check completed' },
+            { icon: '📅', iconClass: 'schedule', text: 'Scheduled GP appointment for P{id}' },
+            { icon: '💊', iconClass: 'call', text: 'Medication review requested for P{id}' },
+            { icon: '🔬', iconClass: 'schedule', text: 'Blood tests ordered for P{id}' },
+            { icon: '🚨', iconClass: 'alert', text: 'Urgent flag raised for P{id}' },
+        ];
+
+        function addActivity() {
+            const list = document.getElementById('activityList');
+            const activity = activities[Math.floor(Math.random() * activities.length)];
+            const patientId = Math.floor(Math.random() * 50000).toString().padStart(5, '0');
+
+            const item = document.createElement('div');
+            item.className = 'activity-item';
+            item.style.opacity = '0';
+            item.innerHTML = `
+                <div class="icon ${activity.iconClass}">${activity.icon}</div>
+                <div class="text">${activity.text.replace('{id}', patientId)}</div>
+                <div class="time">Just now</div>
+            `;
+
+            list.insertBefore(item, list.firstChild);
+            setTimeout(() => item.style.opacity = '1', 50);
+
+            // Remove old items
+            while (list.children.length > 6) {
+                list.removeChild(list.lastChild);
+            }
+
+            // Update called count
+            const called = document.getElementById('calledToday');
+            called.textContent = (parseInt(called.textContent) + 1).toLocaleString();
+        }
+
+        // Add new activity every 8 seconds
+        setInterval(addActivity, 8000);
+    </script>
+</body>
+</html>
